@@ -2,5 +2,5 @@
 *.db
 mounts
 __pycache__
-test
+*/test.*
 *.secret
