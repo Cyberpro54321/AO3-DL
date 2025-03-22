@@ -1,0 +1,4 @@
+*.sql
+*.db
+mounts
+__pycache__
