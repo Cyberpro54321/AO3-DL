@@ -33,6 +33,9 @@ class row:
         self.dateLastUpdated = dateLastUpdated
         self.checkForUpdates = checkForUpdates
 
+    def __str__(self):
+        return str(self.__dict__)
+
     def toTuple(self):
         return (
             self.ID,
@@ -108,4 +111,35 @@ def getRow(
     filename: str,
     logger: logging.Logger,
 ):
-    pass
+    con, cur = openDB(filename=filename, logger=logger)
+    res1 = cur.execute(f"SELECT * FROM works WHERE ID = {ID}")
+    out = res1.fetchone()
+    con.close()
+    return row(
+        ID=out[0],
+        title=out[1],
+        chaptersCount=out[2],
+        chaptersExpected=out[3],
+        dateLastDownloaded=out[4],
+        titleOG=out[5],
+        chaptersCountOG=out[6],
+        chaptersExpectedOG=out[7],
+        dateFirstDownloaded=out[8],
+        dateLastEdited=out[9],
+        dateLastUpdated=out[10],
+        checkForUpdates=out[11],
+    )
+
+
+def getAll(
+    filename: str,
+    logger: logging.Logger,
+):
+    con, cur = openDB(filename=filename, logger=logger)
+    res1 = cur.execute("SELECT ID FROM works")
+    allIDs = res1.fetchall()
+    con.close()
+    mainDict = {}
+    for i in allIDs:
+        mainDict[i[0]] = getRow(ID=i[0], filename=filename, logger=logger)
+    return mainDict
