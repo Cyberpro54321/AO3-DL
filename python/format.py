@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import AO3
@@ -299,8 +300,24 @@ def userstuff_loop(
 
 def finish(
     soup: bs4.BeautifulSoup,
+    work: AO3.works.Work,
     logger: logging.Logger,
 ):
+    soup.append(
+        bs4.Comment(
+            f"File written with download.py from version {constants.version} of AO3-DL (https://codeberg.org/Cyberpro123/AO3-DL)"
+        )
+    )
+    soup.append(
+        bs4.Comment(
+            f"Date Written: {datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()}"
+        )
+    )
+    soup.append(bs4.Comment(f"Work Name: {work.title}"))
+    soup.append(
+        bs4.Comment(f"Work ID: {work.id} (https://archiveofourown.org/works/{work.id})")
+    )
+    soup.append(bs4.Comment(f"Chapters: {work.nchapters}/{work.expected_chapters}"))
     return soup
 
 
@@ -335,5 +352,6 @@ def main(
             rawSoup=rawSoup,
             logger=logger,
         ),
+        work=work,
         logger=logger,
     )
