@@ -12,13 +12,13 @@ class row:
         chaptersCount: int,
         chaptersExpected: int,
         dateLastDownloaded: datetime.datetime,
-        titleOG: str,
-        chaptersCountOG: int,
-        chaptersExpectedOG: int,
-        dateFirstDownloaded: datetime.datetime,
-        dateLastEdited: datetime.datetime,
         dateLastUpdated: datetime.datetime,
-        checkForUpdates: bool,
+        checkForUpdates: bool = False,
+        titleOG: str = "",
+        chaptersCountOG: int = 0,
+        chaptersExpectedOG: int = 0,
+        dateFirstDownloaded: datetime.datetime = 0,
+        dateLastEdited: datetime.datetime = 0,
     ):
         self.ID = ID
         self.title = title
