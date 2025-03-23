@@ -42,13 +42,21 @@ def main(
             network.downloadWork(work=work, filename=filename, logger=logger)
     else:
         network.downloadWork(work=work, filename=filename, logger=logger)
-        rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
-    # TODO: Check if raw file exists. If raw file doesn't exist or is outdated, download new one
+    rowDB = database.getRow(ID=work.id, filename=config["dbFileFull"], logger=logger)
+    if not rowDB:
+        rowDB = rowLive
+        rowDB.dateLastDownloaded = (
+            datetime.datetime.now().astimezone().replace(microsecond=0)
+        )
+        rowDB.titleOG = rowDB.title
+        rowDB.chaptersCountOG = rowDB.chaptersCount
+        rowDB.chaptersExpectedOG = rowDB.chaptersExpected
+        rowDB.dateFirstDownloaded = rowDB.dateLastDownloaded
 
     # Formatting
 
     # Update Database
-    pass
+    database.putRow(ID=work.id, filename=config["dbFileFull"], row=rowDB, logger=logger)
 
 
 if __name__ == "__main__":
@@ -90,4 +98,6 @@ if __name__ == "__main__":
         load_chapters=False,
     )
 
+    if not os.path.exists(config["dbFileFull"]):
+        database.initDB(filename=config["dbFileFull"], logger=logger)
     main(work=work, config=config, logger=logger)
