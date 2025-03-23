@@ -7,6 +7,7 @@ import os.path
 import AO3
 
 import database
+import format
 import network
 import raws
 import settings
@@ -53,9 +54,13 @@ def main(
         rowDB.chaptersExpectedOG = rowDB.chaptersExpected
         rowDB.dateFirstDownloaded = rowDB.dateLastDownloaded
 
-    # Formatting
+    soup = format.main(work=work, raw=filename, logger=logger, config=config)
+    with open(
+        file=f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}",
+        mode="w",
+    ) as out:
+        out.write(soup.prettify(formatter="html5"))
 
-    # Update Database
     database.putRow(ID=work.id, filename=config["dbFileFull"], row=rowDB, logger=logger)
 
 
