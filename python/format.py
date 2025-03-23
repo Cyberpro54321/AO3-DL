@@ -307,7 +307,7 @@ def finish(
 ):
     soup.append(
         bs4.Comment(
-            f"File written with download.py from version {constants.version} of AO3-DL (https://codeberg.org/Cyberpro123/AO3-DL)"
+            f"File written with version {constants.version} of AO3-DL (https://codeberg.org/Cyberpro123/AO3-DL)"
         )
     )
     soup.append(
