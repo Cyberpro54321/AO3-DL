@@ -63,7 +63,7 @@ def getWorkIdFromBs4(
 ):
     hrefs = []
     for link in soup.find_all("a"):
-        hrefs.append(link.ger("href"))
+        hrefs.append(link.get("href"))
     for i in hrefs:
         id = AO3.utils.workid_from_url(i)
         if id:
