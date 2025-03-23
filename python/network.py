@@ -84,3 +84,36 @@ def downloadWork(
     raise Exception(
         f"Could not finish downloading {work.title} after {retries} attempts."
     )
+
+
+# def template(
+#     input: str,
+#     logger: logging.Logger,
+#     retries=constants.loopRetries,
+# ):
+#     loopNo = 1
+#     while loopNo < retries:
+#         try:
+#             logger.log(
+#                 (10 + (20 * int(loopNo > 9))),
+#                 f"(Attempt {loopNo}): ACTION",
+#             )
+#             DO STUFF
+#         except Exception as ex:
+#             random.seed()
+#             pauseLength = random.randrange(35, 85)
+#             logger.warning(
+#                 constants.loopErrorTemplate.format(
+#                     "ERROR MESSAGE",
+#                     pauseLength,
+#                     type(ex).__name__,
+#                     ex.args,
+#                 )
+#             )
+#             time.sleep(pauseLength)
+#         else:
+#             loopNo = retries + 10
+#             return True
+#     raise Exception(
+#         f"Could not (GOAL) after {retries} attempts."
+#     )
