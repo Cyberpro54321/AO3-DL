@@ -1,0 +1,9 @@
+services:
+  nginx:
+    image: nginx
+    #container_name: ""
+    ports:
+      - "8080:80"
+    volumes:
+      - ~/Documents/AO3-DL/Output:/usr/share/nginx/html
+    restart: "unless-stopped"
