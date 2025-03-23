@@ -7,6 +7,38 @@ import AO3
 import constants
 
 
+def getSessionObj(
+    username: str,
+    password: str,
+    logger: logging.Logger,
+    retries=constants.loopRetries,
+):
+    loopNo = 1
+    while loopNo < retries:
+        try:
+            logger.log(
+                (10 + (20 * int(loopNo > 9))),
+                f"(Attempt {loopNo}): Getting AO3.session object",
+            )
+            session = AO3.Session(username=username, password=password)
+        except (TypeError, AO3.utils.LoginError, AO3.utils.HTTPError) as ex:
+            random.seed()
+            pauseLength = random.randrange(35, 85)
+            logger.warning(
+                constants.loopErrorTemplate.format(
+                    "getting session object",
+                    pauseLength,
+                    type(ex).__name__,
+                    ex.args,
+                )
+            )
+            time.sleep(pauseLength)
+        else:
+            loopNo = retries + 10
+            return session
+    raise Exception(f"Could not get AO3 session object after {retries} attempts.")
+
+
 def getWorkObjFromId(
     id: int,
     logger: logging.Logger,
