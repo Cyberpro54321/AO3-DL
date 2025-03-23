@@ -78,7 +78,7 @@ def getWorkObjFromId(
             loopNo = retries + 10
             return work
     raise Exception(
-        f"Could not get AO3.Work object for work {id} after {loopNo} attempts"
+        f"Could not get AO3.Work object for work {id} after {retries} attempts"
     )
 
 
