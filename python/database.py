@@ -150,7 +150,7 @@ def getRow(
         )
 
 
-def getAll(
+def getWorkIdSet(
     filename: str,
     logger: logging.Logger,
 ):
@@ -158,7 +158,7 @@ def getAll(
     res1 = cur.execute("SELECT ID FROM works")
     allIDs = res1.fetchall()
     con.close()
-    mainDict = {}
+    ids = set(())
     for i in allIDs:
-        mainDict[i[0]] = getRow(ID=i[0], filename=filename, logger=logger)
-    return mainDict
+        ids.add(i[0])
+    return ids
