@@ -2,9 +2,11 @@
 
 import datetime
 import logging
+import os.path
 
 import AO3
 
+import database
 import network
 import raws
 import settings
@@ -29,6 +31,18 @@ def main(
     logger: logging.Logger,
     downloadNew: bool = True,
 ):
+    filename = f"{config['dirRaws']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
+    rowLive = database.workToRow(work=work)
+    if os.path.exists(filename):
+        rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
+        if raws.checkUpdates(
+            row1=rowFile.__dict__,
+            row2=rowLive.__dict__,
+        ):
+            network.downloadWork(work=work, filename=filename, logger=logger)
+    else:
+        network.downloadWork(work=work, filename=filename, logger=logger)
+        rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
     # TODO: Check if raw file exists. If raw file doesn't exist or is outdated, download new one
 
     # Formatting
