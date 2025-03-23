@@ -39,6 +39,7 @@ def getSessionObj(
                 )
             )
             time.sleep(pauseLength)
+            loopNo += 1
         else:
             loopNo = retries + 10
             return session
@@ -80,6 +81,7 @@ def getWorkObjFromId(
                 )
             )
             time.sleep(pauseLength)
+            loopNo += 1
         else:
             loopNo = retries + 10
             return work
@@ -116,6 +118,7 @@ def downloadWork(
                 )
             )
             time.sleep(pauseLength)
+            loopNo += 1
         else:
             loopNo = retries + 10
             return True
@@ -149,6 +152,7 @@ def downloadWork(
 #                 )
 #             )
 #             time.sleep(pauseLength)
+#             loopNo += 1
 #         else:
 #             loopNo = retries + 10
 #             return True
