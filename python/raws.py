@@ -119,7 +119,10 @@ def getWorkUpdatedTimeFromBs4(
         .replace("\n", "")
         .split()
     )
-    dateIndex = statsSplit.index("Chapters:")
+    try:
+        dateIndex = statsSplit.index("Updated:")
+    except ValueError:
+        dateIndex = statsSplit.index("Completed:")
     timestamp = statsSplit[dateIndex + 1]
     return datetime.datetime.fromisoformat(timestamp)
 
