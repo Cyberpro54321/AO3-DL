@@ -230,74 +230,92 @@ def userstuff_loop(
         del allChapters
 
     for i in work.chapters:
-        # print(f"{i.title}: {i.number}")
-        divChapters = soup.find(id="chapters")
-        currentChapterDiv = divChapters.append(
-            soup.new_tag(
-                "div", id="chapter-" + str(i.number), attrs={"class": "chapter"}
-            )
+        doChapter(
+            soup=soup,
+            chapter=i,
+            divChapters=soup.find(id="chapters"),
+            currentChapterForewordRaw=allForewordsNumbered.get(i.number),
+            currentChapterRaw=allChaptersNumbered[i.number],
+            divChaptersRaw=divChaptersRaw,
+            logger=logger,
         )
-
-        # foreword
-        currentChapterForeword = currentChapterDiv.append(
-            soup.new_tag("div", attrs={"class": "chapter preface group"})
-        )
-        currentChapterForeword.append(
-            soup.new_tag("h3", attrs={"class": "title"})
-        ).string = ("Chapter " + str(i.number) + ": " + i.title)
-        currentChapterForewordRaw = allForewordsNumbered.get(i.number)
-
-        # summary
-        if i.summary:
-            currentChapterSummary = currentChapterForeword.append(
-                soup.new_tag("div", attrs={"class": "summary module"})
-            )
-            currentChapterSummary.append(
-                soup.new_tag("h3", attrs={"class": "heading"})
-            ).string = "Summary:"
-            currentChapterSummary.append(currentChapterForewordRaw.blockquote)
-
-        # start notes
-        if (
-            i.start_notes
-            and i.start_notes.strip() != "(See the end of the chapter for  notes.)"
-        ):
-            currentChapterStartNotes = currentChapterForeword.append(
-                soup.new_tag("div", attrs={"class": "notes module"})
-            )
-            currentChapterStartNotes.append(
-                soup.new_tag("h3", attrs={"class": "heading"})
-            ).string = "Notes:"
-            currentChapterStartNotes.append(currentChapterForewordRaw.blockquote)
-
-        # chapter main text
-        currentChapterDiv.append(
-            soup.new_tag("div", role="article", attrs={"class": "userstuff module"})
-        ).append(allChaptersNumbered[i.number])
-
-        # chapter afterword
-        if i.end_notes:
-            currentChapterAfterword = currentChapterDiv.append(
-                soup.new_tag(
-                    "div",
-                    id=f"endnotes{i.number}",
-                    attrs={"class": "chapter preface group"},
-                )
-            )
-            currentChapterAfterword.append(
-                soup.new_tag(
-                    "div",
-                    id=f"chapter_{i.number}_endnotes",
-                    atttrs={"class": "end notes module"},
-                )
-            )
-            currentChapterAfterword.div.append(
-                soup.new_tag("h3", attrs={"class": "heading"})
-            ).string = "Notes:"
-            currentChapterAfterword.div.append(
-                divChaptersRaw.find("div", id=f"endnotes{i.number}").blockquote
-            )
     return soup
+
+
+def doChapter(
+    soup: bs4.BeautifulSoup,
+    chapter: AO3.Chapter,
+    divChapters: bs4.element.Tag,
+    currentChapterForewordRaw: bs4.element.Tag,
+    currentChapterRaw: bs4.element.Tag,
+    divChaptersRaw: bs4.element.Tag,
+    logger: logging.Logger,
+):
+    logger.info(f"{chapter.title}: {chapter.number}")
+    currentChapterDiv = divChapters.append(
+        soup.new_tag(
+            "div", id="chapter-" + str(chapter.number), attrs={"class": "chapter"}
+        )
+    )
+
+    # foreword
+    currentChapterForeword = currentChapterDiv.append(
+        soup.new_tag("div", attrs={"class": "chapter preface group"})
+    )
+    currentChapterForeword.append(
+        soup.new_tag("h3", attrs={"class": "title"})
+    ).string = ("Chapter " + str(chapter.number) + ": " + chapter.title)
+
+    # summary
+    if chapter.summary:
+        currentChapterSummary = currentChapterForeword.append(
+            soup.new_tag("div", attrs={"class": "summary module"})
+        )
+        currentChapterSummary.append(
+            soup.new_tag("h3", attrs={"class": "heading"})
+        ).string = "Summary:"
+        currentChapterSummary.append(currentChapterForewordRaw.blockquote)
+
+    # start notes
+    if (
+        chapter.start_notes
+        and chapter.start_notes.strip() != "(See the end of the chapter for  notes.)"
+    ):
+        currentChapterStartNotes = currentChapterForeword.append(
+            soup.new_tag("div", attrs={"class": "notes module"})
+        )
+        currentChapterStartNotes.append(
+            soup.new_tag("h3", attrs={"class": "heading"})
+        ).string = "Notes:"
+        currentChapterStartNotes.append(currentChapterForewordRaw.blockquote)
+
+    # chapter main text
+    currentChapterDiv.append(
+        soup.new_tag("div", role="article", attrs={"class": "userstuff module"})
+    ).append(currentChapterRaw)
+
+    # chapter afterword
+    if chapter.end_notes:
+        currentChapterAfterword = currentChapterDiv.append(
+            soup.new_tag(
+                "div",
+                id=f"endnotes{chapter.number}",
+                attrs={"class": "chapter preface group"},
+            )
+        )
+        currentChapterAfterword.append(
+            soup.new_tag(
+                "div",
+                id=f"chapter_{chapter.number}_endnotes",
+                atttrs={"class": "end notes module"},
+            )
+        )
+        currentChapterAfterword.div.append(
+            soup.new_tag("h3", attrs={"class": "heading"})
+        ).string = "Notes:"
+        currentChapterAfterword.div.append(
+            divChaptersRaw.find("div", id=f"endnotes{chapter.number}").blockquote,
+        )
 
 
 def finish(
