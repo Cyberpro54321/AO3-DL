@@ -105,4 +105,5 @@ if __name__ == "__main__":
 
     if not os.path.exists(config["dbFileFull"]):
         database.initDB(filename=config["dbFileFull"], logger=logger)
+    work.load_chapters()
     main(work=work, config=config, logger=logger)
