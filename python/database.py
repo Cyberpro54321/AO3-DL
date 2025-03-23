@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-import sqlite3
 import datetime
 import logging
 import os.path
+import sqlite3
+
+import AO3
 
 
 class row:
@@ -53,6 +55,20 @@ class row:
             self.dateLastUpdated,
             self.checkForUpdates,
         )
+
+
+def workToRow(
+    work: AO3.works.Work,
+):
+    return row(
+        ID=work.id,
+        title=work.title,
+        chaptersCount=work.nchapters,
+        chaptersExpected=int(work.expected_chapters or 0),
+        dateLastDownloaded=0,
+        dateLastUpdated=work.date_updated,
+        dateLastEdited=work.date_edited,
+    )
 
 
 def openDB(
