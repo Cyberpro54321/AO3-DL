@@ -133,20 +133,21 @@ def getRow(
     res1 = cur.execute(f"SELECT * FROM works WHERE ID = {ID}")
     out = res1.fetchone()
     con.close()
-    return row(
-        ID=out[0],
-        title=out[1],
-        chaptersCount=out[2],
-        chaptersExpected=out[3],
-        dateLastDownloaded=out[4],
-        titleOG=out[5],
-        chaptersCountOG=out[6],
-        chaptersExpectedOG=out[7],
-        dateFirstDownloaded=out[8],
-        dateLastEdited=out[9],
-        dateLastUpdated=out[10],
-        checkForUpdates=out[11],
-    )
+    if out:
+        return row(
+            ID=out[0],
+            title=out[1],
+            chaptersCount=out[2],
+            chaptersExpected=out[3],
+            dateLastDownloaded=out[4],
+            titleOG=out[5],
+            chaptersCountOG=out[6],
+            chaptersExpectedOG=out[7],
+            dateFirstDownloaded=out[8],
+            dateLastEdited=out[9],
+            dateLastUpdated=out[10],
+            checkForUpdates=out[11],
+        )
 
 
 def getAll(
