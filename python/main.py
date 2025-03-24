@@ -30,10 +30,11 @@ def main(
     work: AO3.works.Work,
     config: dict,
     logger: logging.Logger,
+    forceDownloadNew=False,
 ):
     filename = f"{config['dirRaws']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     rowLive = database.workToRow(work=work)
-    if os.path.exists(filename):
+    if os.path.exists(filename) and not forceDownloadNew:
         rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
         if raws.checkUpdates(
             row1=rowFile.__dict__,
