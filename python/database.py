@@ -17,7 +17,6 @@ class row:
         chaptersExpected: int,
         dateLastDownloaded: datetime.datetime,
         dateLastUpdated: datetime.datetime,
-        checkForUpdates: bool = False,
         titleOG: str = "",
         chaptersCountOG: int = 0,
         chaptersExpectedOG: int = 0,
@@ -35,7 +34,6 @@ class row:
         self.dateFirstDownloaded = dateFirstDownloaded
         self.dateLastEdited = dateLastEdited
         self.dateLastUpdated = dateLastUpdated
-        self.checkForUpdates = checkForUpdates
 
     def __str__(self):
         return str(self.__dict__)
@@ -53,7 +51,6 @@ class row:
             self.dateFirstDownloaded,
             self.dateLastEdited,
             self.dateLastUpdated,
-            self.checkForUpdates,
         )
 
 
@@ -100,8 +97,7 @@ def initDB(
         chaptersExpectedOG INTEGER,
         dateFirstDownloaded TIMESTAMP,
         dateLastEdited TIMESTAMP,
-        dateLastUpdated TIMESTAMP,
-        checkForUpdates BOOL);"""
+        dateLastUpdated TIMESTAMP);"""
     )
     con.commit()
     con.close()
@@ -116,7 +112,7 @@ def putRow(
     if not os.path.exists(filename):
         initDB(filename=filename, logger=logger)
     insertString = (
-        "INSERT OR REPLACE INTO works VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT OR REPLACE INTO works VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     con, cur = openDB(filename=filename, logger=logger)
     cur.execute(insertString, row.toTuple())
@@ -146,7 +142,6 @@ def getRow(
             dateFirstDownloaded=out[8],
             dateLastEdited=out[9],
             dateLastUpdated=out[10],
-            checkForUpdates=out[11],
         )
 
 
