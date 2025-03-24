@@ -30,7 +30,6 @@ def main(
     work: AO3.works.Work,
     config: dict,
     logger: logging.Logger,
-    downloadNew: bool = True,
 ):
     filename = f"{config['dirRaws']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     rowLive = database.workToRow(work=work)
