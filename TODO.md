@@ -1,12 +1,3 @@
-## Re-Implimentation
-- [ ] Login
-### main.py
-- [ ] Links as input
-### bulk.py
-- [ ] Multithreading
-- [ ] Batch File
-- [ ] Check-Updates
-
 ## Big Features
 - [ ] Workskin Downloading
 - [ ] Documentation
