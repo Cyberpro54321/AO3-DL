@@ -8,6 +8,7 @@ import AO3
 
 import database
 import format
+import getLogger
 import network
 import raws
 import settings
@@ -70,18 +71,17 @@ if __name__ == "__main__":
     settings.parse()
     config = settings.settings
 
-    logger = logging.getLogger(__name__)
+    logCore = "raws-to-batch"
     if config["logsTimestamp"]:
-        logName = f"main-{datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()}"
+        logAppend = (
+            datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
+        )
     else:
-        logName = "main-latest"
-    logging.basicConfig(
-        filename=f"{config['dirLogs']}/{logName}.log",
-        filemode="w",
-        encoding="utf-8",
-        level=logging.INFO,
-        format="[%(asctime)s] [%(levelname)-8s]: %(message)s",
-        datefmt="%H:%M:%S",
+        logAppend = "latest"
+    logger = getLogger.getLogger(
+        core=logCore,
+        append=logAppend,
+        dirLogs=config["dirLogs"],
     )
 
     if config["ao3DoLogin"]:

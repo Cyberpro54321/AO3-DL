@@ -2,12 +2,12 @@
 
 import concurrent.futures
 import datetime
-import logging
 import os.path
 
 import AO3
 
 import database
+import getLogger
 import main
 import network
 import settings
@@ -37,18 +37,16 @@ download_all = settings.args.download_all
 from_batch = settings.args.from_batch
 
 
-logger = logging.getLogger(__name__)
+logCore = "raws-to-batch"
 if config["logsTimestamp"]:
-    logName = f"bulk-{datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()}"
+    logAppend = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 else:
-    logName = "bulk-latest"
-logging.basicConfig(
-    filename=f"{config['dirLogs']}/{logName}.log",
-    filemode="w",
-    encoding="utf-8",
-    level=logging.INFO,
-    format="[%(asctime)s] [%(levelname)-8s] [%(threadName)-9s]: %(message)s",
-    datefmt="%H:%M:%S",
+    logAppend = "latest"
+logger = getLogger.getLogger(
+    core=logCore,
+    append=logAppend,
+    dirLogs=config["dirLogs"],
+    includeThreadName=True,
 )
 logger.info("Logger initialized in bulk.py")
 
