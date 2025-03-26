@@ -38,13 +38,13 @@ def main(
     if os.path.exists(filename) and not forceDownloadNew:
         rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
         if raws.checkUpdates(
-            row1=rowFile.__dict__,
-            row2=rowLive.__dict__,
+            row1=rowFile,
+            row2=rowLive,
         ):
             network.downloadWork(work=work, filename=filename, logger=logger)
     else:
         network.downloadWork(work=work, filename=filename, logger=logger)
-    rowDB = database.getRow(ID=work.id, filename=config["dbFileFull"], logger=logger)
+    rowDB = database.getWork(id=work.id, filename=config["dbFileFull"], logger=logger)
     if not rowDB:
         rowDB = rowLive
         rowDB.dateLastDownloaded = (

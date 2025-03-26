@@ -8,7 +8,6 @@ import AO3  # https://github.com/wendytg/ao3_api/
 import bs4  # https://beautiful-soup-4.readthedocs.io/en/latest/
 
 import constants
-import database
 
 
 def checkUpdates(
@@ -39,14 +38,14 @@ def getRowFromFilename(
 ):
     soup = getBs4FromFilename(filename=filename, logger=logger)
     chaptDict = getChapterCountsFromBs4(soup=soup, logger=logger)
-    return database.row(
-        ID=getWorkIdFromBs4(soup=soup, logger=logger),
-        title=getWorkTitleFromBs4(soup=soup, logger=logger),
-        chaptersCount=chaptDict["current"],
-        chaptersExpected=chaptDict["max"],
-        dateLastDownloaded=getModifyTime(filename=filename, logger=logger),
-        dateLastUpdated=getWorkUpdatedTimeFromBs4(soup=soup, logger=logger),
-    )
+    return {
+        "id": getWorkIdFromBs4(soup=soup, logger=logger),
+        "title": getWorkTitleFromBs4(soup=soup, logger=logger),
+        "chaptersCount": chaptDict["current"],
+        "chaptersExpected": chaptDict["max"],
+        "dateLastDownloaded": getModifyTime(filename=filename, logger=logger),
+        "dateLastUpdated": getWorkUpdatedTimeFromBs4(soup=soup, logger=logger),
+    }
 
 
 def getBs4FromFilename(
