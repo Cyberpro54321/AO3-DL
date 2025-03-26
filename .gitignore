@@ -4,3 +4,4 @@ mounts
 __pycache__
 */test.*
 *.secret
+*.txt
