@@ -37,7 +37,7 @@ download_all = settings.args.download_all
 from_batch = settings.args.from_batch
 
 
-logCore = "raws-to-batch"
+logCore = "bulk"
 if config["logsTimestamp"]:
     logAppend = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 else:

@@ -71,7 +71,7 @@ if __name__ == "__main__":
     settings.parse()
     config = settings.settings
 
-    logCore = "raws-to-batch"
+    logCore = "main"
     if config["logsTimestamp"]:
         logAppend = (
             datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
