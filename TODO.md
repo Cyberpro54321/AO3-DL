@@ -3,6 +3,7 @@
 - [ ] Documentation
 - [ ] Git Integration for raw files
 - [ ] PHP Index page
+- [ ] Image Downloading
 - [ ] Environmental Varuables?
 
 ## Small Features
