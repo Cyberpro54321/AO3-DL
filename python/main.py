@@ -35,25 +35,22 @@ def main(
 ):
     filename = f"{config['dirRaws']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     rowLive = database.workToRow(work=work)
+    if os.path.exists(config["dbFileFull"]):
+        rowDB = database.getWork(
+            id=work.id, filename=config["dbFileFull"], logger=logger
+        )
+    else:
+        database.initDB(filename=config["dbFileFull"], logger=logger)
+        rowDB = False
+
     if os.path.exists(filename) and not forceDownloadNew:
-        rowFile = raws.getRowFromFilename(filename=filename, logger=logger)
         if raws.checkUpdates(
-            row1=rowFile,
+            row1=raws.getRowFromFilename(filename=filename, logger=logger),
             row2=rowLive,
         ):
             network.downloadWork(work=work, filename=filename, logger=logger)
     else:
         network.downloadWork(work=work, filename=filename, logger=logger)
-    rowDB = database.getWork(id=work.id, filename=config["dbFileFull"], logger=logger)
-    if not rowDB:
-        rowDB = rowLive
-        rowDB.dateLastDownloaded = (
-            datetime.datetime.now().astimezone().replace(microsecond=0)
-        )
-        rowDB.titleOG = rowDB.title
-        rowDB.chaptersCountOG = rowDB.chaptersCount
-        rowDB.chaptersExpectedOG = rowDB.chaptersExpected
-        rowDB.dateFirstDownloaded = rowDB.dateLastDownloaded
 
     soup = format.main(work=work, raw=filename, logger=logger, config=config)
     with open(
@@ -62,7 +59,14 @@ def main(
     ) as out:
         out.write(soup.prettify(formatter="html5"))
 
-    database.putRow(ID=work.id, filename=config["dbFileFull"], row=rowDB, logger=logger)
+    if rowDB:
+        database.updateWork(
+            id=work.id, filename=config["dbFileFull"], row=rowLive, logger=logger
+        )
+    else:
+        database.newWork(
+            id=work.id, filename=config["dbFileFull"], row=rowLive, logger=logger
+        )
 
 
 if __name__ == "__main__":

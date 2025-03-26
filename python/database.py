@@ -29,7 +29,9 @@ def workToRow(
         "title": work.title,
         "chaptersCount": work.nchapters,
         "chaptersExpected": int(work.expected_chapters or 0),
-        "dateLastDownloaded": 0,
+        "dateLastDownloaded": datetime.datetime.now()
+        .astimezone()
+        .replace(microsecond=0),
         "dateLastUpdated": work.date_updated,
         "dateLastEdited": work.date_edited,
     }
@@ -98,17 +100,19 @@ def newWork(
     con, cur = openDB(filename=filename, logger=logger)
     insertString = "INSERT INTO works VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     insertTuple = tuple(
-        id,
-        row["title"],
-        row["chaptersCount"],
-        row["chaptersExpected"],
-        row["dateLastDownloaded"],
-        row["title"],
-        row["chaptersCount"],
-        row["chaptersExpected"],
-        row["dateLastDownloaded"],
-        row["dateLastEdited"],
-        row["dateLastUpdated"],
+        (
+            id,
+            row["title"],
+            row["chaptersCount"],
+            row["chaptersExpected"],
+            row["dateLastDownloaded"],
+            row["title"],
+            row["chaptersCount"],
+            row["chaptersExpected"],
+            row["dateLastDownloaded"],
+            row["dateLastEdited"],
+            row["dateLastUpdated"],
+        )
     )
     cur.execute(insertString, insertTuple)
     con.commit()
