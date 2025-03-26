@@ -12,9 +12,9 @@ def getLogger(
 ):
     logger = logging.getLogger(__name__)
     if includeThreadName:
-        formatStr = ("[%(asctime)s] [%(levelname)-8s] [%(threadName)-8s]: %(message)s",)
+        formatStr = "[%(asctime)s] [%(levelname)-8s] [%(threadName)-8s]: %(message)s"
     else:
-        formatStr = ("[%(asctime)s] [%(levelname)-8s]: %(message)s",)
+        formatStr = "[%(asctime)s] [%(levelname)-8s]: %(message)s"
     logging.basicConfig(
         filename=f"{dirLogs}/{core}-{append}.log",
         filemode="w",
