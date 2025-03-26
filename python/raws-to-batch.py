@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import datetime
-import logging
 import os.path
 
+import getLogger
 import raws
 import settings
 
@@ -12,18 +12,15 @@ settings.parser.add_argument("input", default="raws-to-batch.txt", nargs="?")
 settings.parse()
 config = settings.settings
 
-logger = logging.getLogger(__name__)
+logCore = "raws-to-batch"
 if config["logsTimestamp"]:
-    logName = f"raws-to-batch-{datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()}"
+    logAppend = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 else:
-    logName = "raws-to-batch-latest"
-logging.basicConfig(
-    filename=f"{config['dirLogs']}/{logName}.log",
-    filemode="w",
-    encoding="utf-8",
-    level=logging.INFO,
-    format="[%(asctime)s] [%(levelname)-8s]: %(message)s",
-    datefmt="%H:%M:%S",
+    logAppend = "latest"
+logger = getLogger.getLogger(
+    core=logCore,
+    append=logAppend,
+    dirLogs=config["dirLogs"],
 )
 
 ids = set(())
