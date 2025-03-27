@@ -2,7 +2,6 @@
 
 import datetime
 import logging
-import os.path
 import sqlite3
 
 import AO3

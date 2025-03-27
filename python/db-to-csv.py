@@ -2,7 +2,6 @@
 
 import csv
 import datetime
-import os.path
 
 import database
 import getLogger

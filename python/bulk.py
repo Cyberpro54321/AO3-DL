@@ -4,8 +4,6 @@ import concurrent.futures
 import datetime
 import os.path
 
-import AO3
-
 import database
 import getLogger
 import main
