@@ -49,7 +49,6 @@ logger = getLogger.getLogger(
     dirLogs=config["dirLogs"],
     includeThreadName=True,
 )
-logger.info("Logger initialized in bulk.py")
 
 if config["ao3DoLogin"]:
     with open(config["ao3UsernameFile"]) as file:

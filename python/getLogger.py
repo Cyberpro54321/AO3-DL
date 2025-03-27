@@ -23,4 +23,5 @@ def getLogger(
         format=formatStr,
         datefmt="%H:%M:%S",
     )
+    logger.info("Logger Initialized")
     return logger
