@@ -22,7 +22,10 @@ def primary(id):
         load_chapters=False,
     )
     main.main(work=work, config=config, logger=logger, forceDownloadNew=download_all)
-    logger.info(f"Completed {id}")
+    global worksComplete
+    global worksTotal
+    worksComplete += 1
+    logger.info(f"Completed {id} - Work {worksComplete}/{worksTotal}")
 
 
 settings.setup()
@@ -78,12 +81,14 @@ if from_batch:
 else:
     ids = database.getWorkIdSet(filename=config["dbFileFull"], logger=logger)
 
+worksComplete = 0
+worksTotal = len(ids)
 
 with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix="worker"
 ) as pool:
     for i in ids:
-        pool.submit(primary, i, logger)
+        pool.submit(primary, i)
 
 
 logger.info("Complete, bulk.py exiting")
