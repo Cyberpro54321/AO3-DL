@@ -15,6 +15,7 @@ def getSessionObj(
     logger: logging.Logger,
     retries=constants.loopRetries,
 ):
+    logger.info("Logging in...")
     loopNo = 1
     while loopNo < retries:
         try:
