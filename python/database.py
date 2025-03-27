@@ -60,13 +60,13 @@ def initDB(
         title VARCHAR(256),
         chaptersCount INTEGER,
         chaptersExpected INTEGER,
-        dateLastDownloaded TIMESTAMP,
+        dateLastDownloaded INTEGER,
         titleOG VARCHAR(256),
         chaptersCountOG INTEGER,
         chaptersExpectedOG INTEGER,
-        dateFirstDownloaded TIMESTAMP,
-        dateLastEdited TIMESTAMP,
-        dateLastUpdated TIMESTAMP);"""
+        dateFirstDownloaded INTEGER,
+        dateLastEdited INTEGER,
+        dateLastUpdated INTEGER);"""
     )
     con.commit()
     con.close()
@@ -105,13 +105,13 @@ def newWork(
             row["title"],
             row["chaptersCount"],
             row["chaptersExpected"],
-            row["dateLastDownloaded"],
+            int(row["dateLastDownloaded"].timestamp()),
             row["title"],
             row["chaptersCount"],
             row["chaptersExpected"],
-            row["dateLastDownloaded"],
-            row["dateLastEdited"],
-            row["dateLastUpdated"],
+            int(row["dateLastDownloaded"].timestamp()),
+            int(row["dateLastEdited"].timestamp()),
+            int(row["dateLastUpdated"].timestamp()),
         )
     )
     cur.execute(insertString, insertTuple)
@@ -128,17 +128,23 @@ def updateWork(
     if id != row["id"]:
         raise Exception
     con, cur = openDB(filename=filename, logger=logger)
-    updateString = f"""
+    updateString = """
     UPDATE works
-    SET title = {row['title']}
-    SET chaptersCount = {row['chaptersCount']}
-    SET chaptersExpected = {row['chaptersExpected']}
-    SET dateLastDownloaded = {row['dateLastDownloaded']}
-    SET dateLastEdited = {row['dateLastEdited']}
-    SET dateLastUpdated = {row['dateLastUpdated']}
-    WHERE ID = {id};
+    SET title = ?, chaptersCount = ?, chaptersExpected = ?, dateLastDownloaded = ?, dateLastEdited = ?, dateLastUpdated = ?
+    WHERE ID = ?;
     """
-    cur.execute(updateString)
+    updateTuple = tuple(
+        (
+            row["title"],
+            row["chaptersCount"],
+            row["chaptersExpected"],
+            int(row["dateLastDownloaded"].timestamp()),
+            int(row["dateLastEdited"].timestamp()),
+            int(row["dateLastUpdated"].timestamp()),
+            id,
+        )
+    )
+    cur.execute(updateString, updateTuple)
     con.commit()
     con.close()
 
@@ -160,9 +166,9 @@ def getWork(
             "title": out[0],
             "chaptersCount": out[1],
             "chaptersExpected": out[2],
-            "dateLastDownloaded": out[3],
-            "dateLastEdited": out[4],
-            "dateLastUpdated": out[5],
+            "dateLastDownloaded": datetime.datetime.fromtimestamp(out[3]),
+            "dateLastEdited": datetime.datetime.fromtimestamp(out[4]),
+            "dateLastUpdated": datetime.datetime.fromtimestamp(out[5]),
         }
     else:
         return False
