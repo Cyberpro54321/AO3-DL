@@ -6,10 +6,10 @@
 - [ ] Image Downloading
 - [ ] SQLite Series Table
 - [ ] PHP Series Page
-- [ ] Environmental Varuables?
 
 ## Small Features
 - [ ] Configurable Log Levels
+- [ ] Environmental Varuables?
 
 ## Bug Testing
 - [ ] Check works with no summaries
