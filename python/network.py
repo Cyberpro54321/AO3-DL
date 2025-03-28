@@ -26,7 +26,7 @@ def downloadFile(
         url[int((-252 + len(extension)) * 0.75):].encode()
     ).decode()
     loopNo = 1
-    while loopNo < retries:
+    while loopNo <= retries:
         try:
             logger.log(
                 (10 + (20 * int(loopNo != 1))),
@@ -67,7 +67,7 @@ def getSessionObj(
 ):
     logger.info("Logging in...")
     loopNo = 1
-    while loopNo < retries:
+    while loopNo <= retries:
         try:
             logger.log(
                 (10 + (20 * int(loopNo > 9))),
@@ -106,7 +106,7 @@ def getWorkObjFromId(
     load_chapters=True,
 ):
     loopNo = 1
-    while loopNo < retries:
+    while loopNo <= retries:
         try:
             logger.log(
                 (10 + (20 * int(loopNo > 9))),
@@ -149,7 +149,7 @@ def downloadWork(
     # useGit: bool = False,
 ):
     loopNo = 1
-    while loopNo < retries:
+    while loopNo <= retries:
         try:
             logger.log(
                 (10 + (20 * int(loopNo > 9))),
@@ -184,7 +184,7 @@ def downloadWork(
 #     retries=constants.loopRetries,
 # ):
 #     loopNo = 1
-#     while loopNo < retries:
+#     while loopNo <= retries:
 #         try:
 #             logger.log(
 #                 (10 + (20 * int(loopNo > 9))),
