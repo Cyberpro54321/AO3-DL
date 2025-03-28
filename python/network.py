@@ -56,7 +56,7 @@ def downloadFile(
                 f"Successfully downloaded file {url} as\n{fileNameCore}.{extension}"
             )
             return f"{fileNameCore}.{extension}"
-    raise Exception(f"Could not download file {url} after {retries} attempts.")
+    return url
 
 
 def getSessionObj(

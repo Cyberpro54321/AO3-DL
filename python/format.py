@@ -332,7 +332,16 @@ def getImages(
             if img.attrs["src"] in filesDownloaded.keys():
                 img.attrs["src"] = filesDownloaded[img.attrs["src"]]
             else:
-                relpath = f"../{imgDir.split('/')[-2]}/{id}/{network.downloadFile(url=img.attrs['src'], dir=f'{imgDir}/{id}', logger=logger)}"
+                filename = network.downloadFile(
+                    url=img.attrs["src"], dir=f"{imgDir}/{id}", logger=logger
+                )
+                if filename == img.attrs["src"]:
+                    logger.error(
+                        f"Failed to download image {filename}, leaving link to externally-hosted version."
+                    )
+                    relpath = filename
+                else:
+                    relpath = f"../{imgDir.split('/')[-1]}/{id}/{filename}"
                 filesDownloaded[img.attrs["src"]] = relpath
                 img.attrs["src"] = relpath
     return soup
