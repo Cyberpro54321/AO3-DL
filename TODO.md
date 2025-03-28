@@ -3,7 +3,7 @@
 - [ ] Documentation
 - [ ] Git Integration for raw files
 - [ ] PHP Index page
-- [ ] Image Downloading
+- [X] Image Downloading
 - [ ] SQLite Series Table
 - [ ] PHP Series Page
 
