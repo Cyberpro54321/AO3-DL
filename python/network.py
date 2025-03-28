@@ -16,7 +16,7 @@ def downloadFile(
     url: str,
     dir: str,
     logger: logging.Logger,
-    retries=constants.loopRetries,
+    retries: int = 3,
 ) -> str:
     logger.info(f"Downloading file {url}")
     parseResult = urllib.parse.urlparse(url=url)
@@ -29,11 +29,11 @@ def downloadFile(
     while loopNo < retries:
         try:
             logger.log(
-                (10 + (20 * int(loopNo > 9))),
+                (10 + (20 * int(loopNo != 1))),
                 f"(Attempt {loopNo}): Downloading file {url}",
             )
             urllib.request.urlretrieve(url, f"{dir}/{fileNameCore}.{extension}")
-        except urllib.error.HTTPError as ex:
+        except (urllib.error.HTTPError, urllib.error.URLError) as ex:
             random.seed()
             if type(ex).__name__ == "HTTPError":
                 pauseLengthRange = (35, 85)
