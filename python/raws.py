@@ -121,7 +121,10 @@ def getWorkUpdatedTimeFromBs4(
     try:
         dateIndex = statsSplit.index("Updated:")
     except ValueError:
-        dateIndex = statsSplit.index("Completed:")
+        try:
+            dateIndex = statsSplit.index("Completed:")
+        except ValueError:
+            dateIndex = statsSplit.index("Published:")
     timestamp = statsSplit[dateIndex + 1]
     return datetime.datetime.fromisoformat(timestamp)
 
