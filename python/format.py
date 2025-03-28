@@ -344,6 +344,8 @@ def getImages(
                     relpath = f"../{imgDir.split('/')[-1]}/{id}/{filename}"
                 filesDownloaded[img.attrs["src"]] = relpath
                 img.attrs["src"] = relpath
+    if len(filesDownloaded) > 1:
+        logger.info(f"Finished downloading {len(filesDownloaded)} images for work {id}")
     return soup
 
 
