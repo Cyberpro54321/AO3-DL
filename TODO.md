@@ -4,6 +4,8 @@
 - [ ] Git Integration for raw files
 - [ ] PHP Index page
 - [ ] Image Downloading
+- [ ] SQLite Series Table
+- [ ] PHP Series Page
 - [ ] Environmental Varuables?
 
 ## Small Features
