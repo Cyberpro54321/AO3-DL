@@ -27,6 +27,7 @@ def parse():
     settings["dirOutput"] = toAbsPath(config["output"]["dir"])
     settings["dirOutHtml"] = config["output"]["html"].strip("/")
     settings["dirWorkskins"] = config["output"]["workskins"].strip("/")
+    settings["dirOutImg"] = config["output"]["images"].strip("/")
     settings["dirAO3CSS"] = config["output"]["ao3css"].strip("/")
     settings["ao3cssMerged"] = config["ao3"].getboolean("cssMerged")
     settings["dbFileFull"] = toAbsPath(config["database"]["file"])

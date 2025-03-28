@@ -2,11 +2,13 @@
 
 import datetime
 import logging
+import os.path
 
 import AO3
 import bs4
 
 import constants
+import network
 import raws
 
 
@@ -318,6 +320,24 @@ def doChapter(
         )
 
 
+def getImages(
+    soup: bs4.BeautifulSoup,
+    imgDir: str,
+    id: int,
+    logger: logging.Logger,
+):
+    filesDownloaded = {}
+    for img in soup.findAll("img"):
+        if "src" in img.attrs:
+            if img.attrs["src"] in filesDownloaded.keys():
+                img.attrs["src"] = filesDownloaded[img.attrs["src"]]
+            else:
+                relpath = f"../{imgDir.split('/')[-2]}/{id}/{network.downloadFile(url=img.attrs['src'], dir=f'{imgDir}/{id}', logger=logger)}"
+                filesDownloaded[img.attrs["src"]] = relpath
+                img.attrs["src"] = relpath
+    return soup
+
+
 def finish(
     soup: bs4.BeautifulSoup,
     work: AO3.works.Work,
@@ -355,21 +375,29 @@ def main(
         config = settings.settings
     with open(raw) as rawFile:
         rawSoup = bs4.BeautifulSoup(rawFile, features="lxml")
+    os.makedirs(
+        name=f"{config['dirOutput']}/{config['dirOutImg']}/{work.id}", exist_ok=True
+    )
     return finish(
-        soup=userstuff_loop(
-            soup=userstuff_preface(
-                soup=init(
+        soup=getImages(
+            soup=userstuff_loop(
+                soup=userstuff_preface(
+                    soup=init(
+                        work=work,
+                        dirAO3CSS=config["dirAO3CSS"],
+                        stylesheetsMerged=config["ao3cssMerged"],
+                        dirWorkskins=config["dirWorkskins"],
+                    ),
                     work=work,
-                    dirAO3CSS=config["dirAO3CSS"],
-                    stylesheetsMerged=config["ao3cssMerged"],
-                    dirWorkskins=config["dirWorkskins"],
+                    rawSoup=rawSoup,
+                    logger=logger,
                 ),
                 work=work,
                 rawSoup=rawSoup,
                 logger=logger,
             ),
-            work=work,
-            rawSoup=rawSoup,
+            imgDir=f"{config['dirOutput']}/{config['dirOutImg']}",
+            id=work.id,
             logger=logger,
         ),
         work=work,

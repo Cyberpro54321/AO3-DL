@@ -1,12 +1,62 @@
 #!/usr/bin/env python3
 
+import base64
 import logging
 import random
 import time
+import urllib.parse
+import urllib.request
 
 import AO3
 
 import constants
+
+
+def downloadFile(
+    url: str,
+    dir: str,
+    logger: logging.Logger,
+    retries=constants.loopRetries,
+) -> str:
+    logger.info(f"Downloading file {url}")
+    parseResult = urllib.parse.urlparse(url=url)
+    extension = parseResult.path.split("/")[-1].split(".")[-1]
+    # above will shit the bed if given a directory URL instead of a file url. Not important for intended usecase
+    fileNameCore = base64.urlsafe_b64encode(
+        url[int((-252 + len(extension)) * 0.75):].encode()
+    ).decode()
+    loopNo = 1
+    while loopNo < retries:
+        try:
+            logger.log(
+                (10 + (20 * int(loopNo > 9))),
+                f"(Attempt {loopNo}): Downloading file {url}",
+            )
+            urllib.request.urlretrieve(url, f"{dir}/{fileNameCore}.{extension}")
+        except urllib.error.HTTPError as ex:
+            random.seed()
+            if type(ex).__name__ == "HTTPError":
+                pauseLengthRange = (35, 85)
+            else:
+                pauseLengthRange = (5, 15)
+            pauseLength = random.randrange(pauseLengthRange[0], pauseLengthRange[1])
+            logger.warning(
+                constants.loopErrorTemplate.format(
+                    f"downloading file {url}",
+                    pauseLength,
+                    type(ex).__name__,
+                    ex.args,
+                )
+            )
+            time.sleep(pauseLength)
+            loopNo += 1
+        else:
+            loopNo = retries + 10
+            logger.info(
+                f"Successfully downloaded file {url} as\n{fileNameCore}.{extension}"
+            )
+            return f"{fileNameCore}.{extension}"
+    raise Exception(f"Could not download file {url} after {retries} attempts.")
 
 
 def getSessionObj(
