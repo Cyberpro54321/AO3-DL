@@ -8,7 +8,7 @@
 - [ ] PHP Series Page
 
 ## Small Features
-- [ ] Configurable Log Levels
+- [X] Configurable Log Levels
 - [ ] Environmental Varuables?
 
 ## Bug Testing

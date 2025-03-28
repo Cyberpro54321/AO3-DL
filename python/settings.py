@@ -2,6 +2,7 @@
 
 import argparse
 import configparser
+import logging
 import os.path
 
 
@@ -34,3 +35,15 @@ def parse():
     settings["ao3DoLogin"] = config["ao3"].getboolean("login")
     settings["ao3UsernameFile"] = toAbsPath(config["ao3"]["usernameFile"])
     settings["ao3PasswordFile"] = toAbsPath(config["ao3"]["passwordFile"])
+    if isinstance(config["logs"]["level"], str):
+        for i in (
+            ("debug", logging.DEBUG),
+            ("info", logging.INFO),
+            ("warning", logging.WARNING),
+            ("error", logging.ERROR),
+            ("critical", logging.CRITICAL),
+        ):
+            if config["logs"]["level"].lower() == i[0]:
+                settings["logsLevel"] = i[1]
+    elif isinstance(config["logs"]["level"], int):
+        settings["logsLevel"] - config["logs"]["level"]

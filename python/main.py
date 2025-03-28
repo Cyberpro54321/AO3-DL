@@ -86,6 +86,7 @@ if __name__ == "__main__":
         core=logCore,
         append=logAppend,
         dirLogs=config["dirLogs"],
+        level=config["logsLevel"],
     )
 
     if config["ao3DoLogin"]:

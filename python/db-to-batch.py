@@ -20,6 +20,7 @@ logger = getLogger.getLogger(
     core=logCore,
     append=logAppend,
     dirLogs=config["dirLogs"],
+    level=config["logsLevel"],
 )
 
 ids = database.getWorkIdSet(filename=config["dbFileFull"], logger=logger)

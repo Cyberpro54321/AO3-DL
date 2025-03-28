@@ -21,6 +21,7 @@ logger = getLogger.getLogger(
     core=logCore,
     append=logAppend,
     dirLogs=config["dirLogs"],
+    level=config["logsLevel"],
 )
 
 cur, con = database.openDB(filename=config["dbFileFull"], logger=logger)
