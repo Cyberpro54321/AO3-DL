@@ -19,7 +19,10 @@ def primary(id):
         session=session,
         load_chapters=False,
     )
+    logger.info(f"Got AO3.Work object for {id}")
     main.main(work=work, config=config, logger=logger, forceDownloadNew=download_all)
+    global completed
+    completed.add(id)
     global worksComplete
     global worksTotal
     worksComplete += 1
@@ -68,6 +71,7 @@ if not os.path.exists(config["dbFileFull"]):
     database.initDB(filename=config["dbFileFull"], logger=logger)
 
 ids = set(())
+completed = set(())
 if from_batch:
     batchBuffer = []
     with open(os.path.expanduser(from_batch)) as batchfile:
@@ -86,6 +90,11 @@ with concurrent.futures.ThreadPoolExecutor(
 ) as pool:
     for i in ids:
         pool.submit(primary, i)
+
+for i in ids.difference(completed):
+    errorMsg = f"Work {i} failed to complete"
+    print(errorMsg)
+    logger.error(errorMsg)
 
 
 logger.info("Complete, bulk.py exiting")
