@@ -1,9 +1,21 @@
 services:
   nginx:
-    image: nginx
+    image: nginx:alpine
     #container_name: ""
     ports:
       - "8080:80"
     volumes:
-      - ~/Documents/AO3-DL/Output:/usr/share/nginx/html
+      - ~/Documents/AO3-DL/Output:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: "unless-stopped"
+    links:
+      - php
+    depends_on:
+      - php
+
+  php:
+    image: php:fpm-alpine
+    #container_name: ""
+    volumes:
+      - ~/Documents/AO3-DL/Output:/var/www/html
     restart: "unless-stopped"
