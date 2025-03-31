@@ -31,9 +31,22 @@ def primary(id):
 
 settings.setup()
 groupAction = settings.parser.add_mutually_exclusive_group(required=True)
-groupAction.add_argument("--download-updates", action="store_true")
-groupAction.add_argument("--download-all", action="store_true")
-groupAction.add_argument("--from-batch")
+groupAction.add_argument(
+    "--download-updates",
+    action="store_true",
+    help="Go through all works in the database, then re-download and re-format any with updates since the version on file.",
+)
+groupAction.add_argument(
+    "--download-all",
+    action="store_true",
+    help="Re-download and re-format all works in database, even if no updates.",
+)
+groupAction.add_argument(
+    "--from-batch",
+    type=str,
+    help="Download and format all works in a specified batch file, without re-downloading any up-to-date Raws already present.",
+    metavar="FILE",
+)
 settings.parse()
 config = settings.settings
 download_updates = settings.args.download_updates
