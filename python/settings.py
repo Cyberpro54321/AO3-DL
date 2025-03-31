@@ -69,6 +69,26 @@ def setup():
     )
 
 
+def input(
+    default: str = "",
+    helptext: str = "Input",
+    name: str = "input",
+):
+    if default:
+        parser.add_argument(
+            name,
+            type=str,
+            default=default,
+            help=helptext,
+        )
+    else:
+        parser.add_argument(
+            name,
+            type=str,
+            help=helptext,
+        )
+
+
 def parse():
     global args
     args = parser.parse_args()

@@ -8,7 +8,11 @@ import getLogger
 import settings
 
 settings.setup()
-settings.parser.add_argument("input", default="db-to-csv.csv", nargs="?")
+settings.input(
+    default="db-to-csv.csv",
+    helptext="Name of output csv file",
+    name="output",
+)
 settings.parse()
 config = settings.settings
 
@@ -42,7 +46,7 @@ for i in out:
         "dateFirstDownloaded": i[9],
         "dateLastEdited": i[10],
     }
-with open(settings.args.input, "w") as csvfile:
+with open(settings.args.output, "w") as csvfile:
     writer = csv.DictWriter(
         csvfile,
         fieldnames=(

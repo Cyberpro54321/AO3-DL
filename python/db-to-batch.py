@@ -7,7 +7,11 @@ import getLogger
 import settings
 
 settings.setup()
-settings.parser.add_argument("input", default="db-to-batch.txt", nargs="?")
+settings.input(
+    default="db-to-batch.txt",
+    helptext="Name of output batch file",
+    name="output",
+)
 settings.parse()
 config = settings.settings
 
@@ -25,6 +29,6 @@ logger = getLogger.getLogger(
 
 ids = database.getWorkIdSet(filename=config["dbFileFull"], logger=logger)
 
-with open(settings.args.input, "w") as out:
+with open(settings.args.output, "w") as out:
     for i in ids:
         out.write(f"{i}\n")

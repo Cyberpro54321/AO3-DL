@@ -71,7 +71,10 @@ def main(
 
 if __name__ == "__main__":
     settings.setup()
-    settings.parser.add_argument("input")
+    settings.input(
+        helptext="WorkID of or link to work.",
+        name="input",
+    )
     settings.parse()
     config = settings.settings
 

@@ -8,7 +8,11 @@ import raws
 import settings
 
 settings.setup()
-settings.parser.add_argument("input", default="raws-to-batch.txt", nargs="?")
+settings.input(
+    default="raws-to-batch.txt",
+    helptext="Name of output batch file",
+    name="output",
+)
 settings.parse()
 config = settings.settings
 
@@ -36,6 +40,6 @@ for i in os.listdir(config["dirRaws"]):
         )
         ids.add(id)
 
-with open(settings.args.input, "w") as out:
+with open(settings.args.output, "w") as out:
     for i in ids:
         out.write(f"{i}\n")
