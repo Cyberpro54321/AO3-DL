@@ -72,7 +72,6 @@ def setup():
 def parse():
     global args
     args = parser.parse_args()
-    print(args.logs_timestamp)
     global settings
     settings = {}
     config = configparser.ConfigParser()
@@ -130,5 +129,5 @@ def parse():
         settings["logsLevel"] - config["logs"]["level"]
 
     for i in ("dirRaws", "dirLogs"):
-        if not os.path.exists(config[i]):
+        if not os.path.exists(settings[i]):
             raise Exception(f"Specified directory doesn't exist: {settings[i]}")
