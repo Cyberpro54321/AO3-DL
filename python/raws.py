@@ -13,13 +13,13 @@ import constants
 def parseInput(
     input: str,
     logger: logging.Logger,
-):
+) -> int:
     try:
         id = int(input.strip())
     except ValueError:
         id = AO3.utils.workid_from_url(input)
     if not id:
-        raise Exception(f"Invalid input to main() in main.py: {input}")
+        raise Exception(f"Invalid input: {input}")
     return id
 
 
