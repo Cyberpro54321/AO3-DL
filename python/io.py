@@ -42,11 +42,18 @@ def batchToSet(
     input: str,
     logger: logging.Logger,
 ) -> set:
-    ids = set(())
+    ids = {}
     with open(input) as inputFile:
-        for i in inputFile:
-            ids.add(raws.parseInput(input=i, logger=logger))
-    return ids
+        for num, i in enumerate(inputFile):
+            id = raws.parseInput(input=i, logger=logger)
+            if ids.get(id):
+                errStr = (
+                    f"Duplicate found: line {ids[id]} is the same as line {num} ({id})"
+                )
+                print(errStr)
+                logger.warning(errStr)
+            ids[id] = num
+    return set(ids.keys())
 
 
 def dbToDict(
