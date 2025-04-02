@@ -5,6 +5,7 @@ import datetime
 import os.path
 import logging
 
+import constants
 import database
 import getLogger
 import raws
@@ -44,12 +45,15 @@ def batchToSet(
 ) -> set:
     ids = {}
     with open(input) as inputFile:
+        items = 0
+        for i in inputFile:
+            items += 1
+        digits = len(str(items))
+    with open(input) as inputFile:
         for num, i in enumerate(inputFile):
             id = raws.parseInput(input=i, logger=logger)
             if ids.get(id):
-                errStr = (
-                    f"Duplicate found: line {ids[id]} is the same as line {num} ({id})"
-                )
+                errStr = f"Duplicate found: line [{ids[id]:<{digits}}] is the same as line [{num:<{digits}}] ({id:<{constants.workIdMaxDigits}})"
                 print(errStr)
                 logger.warning(errStr)
             ids[id] = num
