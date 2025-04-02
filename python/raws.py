@@ -17,7 +17,7 @@ def parseInput(
     try:
         id = int(input.strip())
     except ValueError:
-        id = AO3.utils.workid_from_url(input)
+        id = AO3.utils.workid_from_url(input.strip())
     if not id:
         raise Exception(f"Invalid input: {input}")
     return id
