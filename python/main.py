@@ -13,18 +13,7 @@ import network
 import raws
 import settings
 
-
-def parseInput(
-    input: str,
-    logger: logging.Logger,
-):
-    try:
-        id = int(input.strip())
-    except ValueError:
-        id = AO3.utils.workid_from_url(input)
-    if not id:
-        raise Exception(f"Invalid input to main() in main.py: {input}")
-    return id
+parseInput = raws.parseInput
 
 
 def main(
