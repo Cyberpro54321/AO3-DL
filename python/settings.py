@@ -110,6 +110,8 @@ def parse():
 
     settings["dirOutImg"] = config["output"]["images"].strip("/")
 
+    settings["doImageDownloading"] = config["output"].getboolean("doImageDownloading")
+
     settings["dirAO3CSS"] = config["output"]["ao3css"].strip("/")
 
     settings["ao3cssMerged"] = config["ao3"].getboolean("cssMerged")

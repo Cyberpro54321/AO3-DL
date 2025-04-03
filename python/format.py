@@ -389,28 +389,31 @@ def main(
     os.makedirs(
         name=f"{config['dirOutput']}/{config['dirOutImg']}/{work.id}", exist_ok=True
     )
-    return finish(
-        soup=getImages(
-            soup=userstuff_loop(
-                soup=userstuff_preface(
-                    soup=init(
-                        work=work,
-                        dirAO3CSS=config["dirAO3CSS"],
-                        stylesheetsMerged=config["ao3cssMerged"],
-                        dirWorkskins=config["dirWorkskins"],
-                    ),
-                    work=work,
-                    rawSoup=rawSoup,
-                    logger=logger,
-                ),
+    soup = userstuff_loop(
+        soup=userstuff_preface(
+            soup=init(
                 work=work,
-                rawSoup=rawSoup,
-                logger=logger,
+                dirAO3CSS=config["dirAO3CSS"],
+                stylesheetsMerged=config["ao3cssMerged"],
+                dirWorkskins=config["dirWorkskins"],
             ),
-            imgDir=f"{config['dirOutput']}/{config['dirOutImg']}",
-            id=work.id,
+            work=work,
+            rawSoup=rawSoup,
             logger=logger,
         ),
         work=work,
+        rawSoup=rawSoup,
         logger=logger,
     )
+    if config["doImageDownloading"]:
+        soup = getImages(
+            imgDir=f"{config['dirOutput']}/{config['dirOutImg']}",
+            id=work.id,
+            logger=logger,
+        )
+    soup = finish(
+        soup=soup,
+        work=work,
+        logger=logger,
+    )
+    return soup
