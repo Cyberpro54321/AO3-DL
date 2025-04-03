@@ -3,7 +3,7 @@
 $config = parse_ini_file('config.ini', true);
 //print_r($config);
 $dirHTML = $config['output']['html'];
-$dbFileRelative = $config['database']['fileOut'];
+$dbFileRelative = $config['output']['database'];
 //echo $dirHTML;
 //echo $dbFilePath;
 
