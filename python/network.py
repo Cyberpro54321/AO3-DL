@@ -12,6 +12,38 @@ import AO3
 import constants
 
 
+def getSeriesObj(
+    seriesID: str,
+    logger: logging.Logger,
+    retries=constants.loopRetries,
+) -> AO3.Series:
+    loopNo = 1
+    while loopNo <= retries:
+        try:
+            logger.log(
+                (10 + (20 * int(loopNo > 9))),
+                f"(Attempt {loopNo}): Getting AO3.series object",
+            )
+            series = AO3.Series(seriesID)
+        except Exception as ex:
+            random.seed()
+            pauseLength = random.randrange(35, 85)
+            logger.warning(
+                constants.loopErrorTemplate.format(
+                    "getting ao3.series object",
+                    pauseLength,
+                    type(ex).__name__,
+                    ex.args,
+                )
+            )
+            time.sleep(pauseLength)
+            loopNo += 1
+        else:
+            loopNo = retries + 10
+            return series
+    raise Exception(f"Could not get AO3.series object after {retries} attempts.")
+
+
 def downloadFile(
     url: str,
     dir: str,
