@@ -407,6 +407,7 @@ def main(
     )
     if config["doImageDownloading"]:
         soup = getImages(
+            soup=soup,
             imgDir=f"{config['dirOutput']}/{config['dirOutImg']}",
             id=work.id,
             logger=logger,
