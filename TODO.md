@@ -1,7 +1,7 @@
 ## Big Features
 - [ ] Workskin Downloading
 - [ ] Documentation
-- [ ] Git Integration for raw files
+- [X] Git Integration for raw files
 - [X] PHP Index page
 - [X] Image Downloading
 - [ ] SQLite Series Table

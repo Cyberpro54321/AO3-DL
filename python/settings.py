@@ -102,6 +102,8 @@ def parse():
     else:
         settings["dirRaws"] = toAbsPath(config["raws"]["dir"])
 
+    settings["useGit"] = config["raws"].getboolean("git")
+
     settings["dirOutput"] = toAbsPath(config["output"]["dir"])
 
     settings["dirOutHtml"] = config["output"]["html"].strip("/")

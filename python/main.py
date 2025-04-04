@@ -37,9 +37,13 @@ def main(
             row1=raws.getRowFromFilename(filename=filename, logger=logger),
             row2=rowLive,
         ):
-            network.downloadWork(work=work, filename=filename, logger=logger)
+            network.downloadWork(
+                work=work, filename=filename, logger=logger, useGit=config["useGit"]
+            )
     else:
-        network.downloadWork(work=work, filename=filename, logger=logger)
+        network.downloadWork(
+            work=work, filename=filename, logger=logger, useGit=config["useGit"]
+        )
 
     soup = format.main(work=work, raw=filename, logger=logger, config=config)
     with open(
