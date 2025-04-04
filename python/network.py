@@ -13,7 +13,7 @@ import constants
 
 
 def getSeriesObj(
-    seriesID: int,
+    seriesID: str,
     logger: logging.Logger,
     retries=constants.loopRetries,
 ) -> AO3.Series:
@@ -25,7 +25,7 @@ def getSeriesObj(
                 f"(Attempt {loopNo}): Getting AO3.series object",
             )
             series = AO3.Series(seriesID)
-        except Exception as ex:
+        except ConnectionError as ex:
             random.seed()
             pauseLength = random.randrange(35, 85)
             logger.warning(

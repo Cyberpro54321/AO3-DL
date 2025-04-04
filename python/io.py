@@ -89,16 +89,27 @@ def seriesToSet(
     seriesID: str,
     logger: logging.Logger,
 ) -> set:
-    series = network.getSeriesObj(
-        seriesID=raws.parseSeriesID(
-            input=seriesID,
-            logger=logger,
-        ),
+    seriesIDInt = raws.parseSeriesID(
+        input=seriesID,
         logger=logger,
     )
+    series1 = network.getSeriesObj(
+        seriesID=seriesIDInt,
+        logger=logger,
+    )
+    pagesSet = divmod(series1.nworks, constants.ao3WorksPerSeriesPage)
+    pagesCount = pagesSet[0] + int(bool(pagesSet[1]))
     ids = set(())
-    for i in series.work_list:
+    for i in series1.work_list:
         ids.add(i.id)
+    if pagesCount != 1:
+        for i in range(2, pagesCount + 1):
+            seriesX = network.getSeriesObj(
+                seriesID=f"{seriesIDInt}?page={i}",
+                logger=logger,
+            )
+            for j in seriesX.work_list:
+                ids.add(j.id)
     return ids
 
 
@@ -181,13 +192,13 @@ group.add_argument(
 # Doesn't work properly due to bug in upstream ao3_api:
 # https://github.com/wendytg/ao3_api/issues/103
 ################################################################
-# group.add_argument(
-#     "--add-series",
-#     type=str,
-#     help="Get the IDs of all Works in a specified Series, then output them as a simple batch file.",
-#     metavar=("Output File", "Series ID/Link"),
-#     nargs=2,
-# )
+group.add_argument(
+    "--add-series",
+    type=str,
+    help="Get the IDs of all Works in a specified Series, then output them as a simple batch file.",
+    metavar=("Output File", "Series ID/Link"),
+    nargs=2,
+)
 settings.parse()
 config = settings.settings
 
