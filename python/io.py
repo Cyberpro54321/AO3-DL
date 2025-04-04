@@ -177,13 +177,17 @@ group.add_argument(
     help="Removes duplicates from target batch file and converts links into work IDs.",
     metavar="File",
 )
-group.add_argument(
-    "--add-series",
-    type=str,
-    help="Get the IDs of all Works in a specified Series, then output them as a simple batch file.",
-    metavar=("Output File", "Series ID/Link"),
-    nargs=2,
-)
+################################################################
+# Doesn't work properly due to bug in upstream ao3_api:
+# https://github.com/wendytg/ao3_api/issues/103
+################################################################
+# group.add_argument(
+#     "--add-series",
+#     type=str,
+#     help="Get the IDs of all Works in a specified Series, then output them as a simple batch file.",
+#     metavar=("Output File", "Series ID/Link"),
+#     nargs=2,
+# )
 settings.parse()
 config = settings.settings
 
