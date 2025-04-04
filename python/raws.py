@@ -10,7 +10,7 @@ import bs4  # https://beautiful-soup-4.readthedocs.io/en/latest/
 import constants
 
 
-def parseInput(
+def parseWorkID(
     input: str,
     logger: logging.Logger,
 ) -> int:

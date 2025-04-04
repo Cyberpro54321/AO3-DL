@@ -52,7 +52,7 @@ def batchToSet(
         digits = len(str(items))
     with open(input) as inputFile:
         for num, i in enumerate(inputFile):
-            id = raws.parseInput(input=i, logger=logger)
+            id = raws.parseWorkID(input=i, logger=logger)
             if ids.get(id):
                 errStr = f"Duplicate found: line [{ids[id]:<{digits}}] is the same as line [{num:<{digits}}] ({id:<{constants.workIdMaxDigits}})"
                 print(errStr)

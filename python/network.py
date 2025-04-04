@@ -13,7 +13,7 @@ import constants
 
 
 def getSeriesObj(
-    seriesID: str,
+    seriesID: int,
     logger: logging.Logger,
     retries=constants.loopRetries,
 ) -> AO3.Series:

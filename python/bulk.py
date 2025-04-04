@@ -92,7 +92,7 @@ if from_batch:
         for i in batchfile:
             batchBuffer.append(i.strip())
     for i in batchBuffer:
-        ids.add(main.parseInput(input=str(i), logger=logger))
+        ids.add(main.parseWorkID(input=str(i), logger=logger))
 else:
     ids = database.getWorkIdSet(filename=config["dbFileFull"], logger=logger)
 

@@ -13,7 +13,7 @@ import network
 import raws
 import settings
 
-parseInput = raws.parseInput
+parseWorkID = raws.parseWorkID
 
 
 def main(
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     else:
         session = None
     work = network.getWorkObjFromId(
-        id=parseInput(input=settings.args.input, logger=logger),
+        id=parseWorkID(input=settings.args.input, logger=logger),
         logger=logger,
         session=session,
         load_chapters=False,
