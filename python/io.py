@@ -102,7 +102,7 @@ def seriesToSet(
     ids = set(())
     for i in series1.work_list:
         ids.add(i.id)
-    if pagesCount != 1:
+    if pagesCount != 1 and len(ids) == constants.ao3WorksPerSeriesPage:
         for i in range(2, pagesCount + 1):
             seriesX = network.getSeriesObj(
                 seriesID=f"{seriesIDInt}?page={i}",
