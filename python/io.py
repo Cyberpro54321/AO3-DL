@@ -89,7 +89,13 @@ def seriesToSet(
     seriesID: str,
     logger: logging.Logger,
 ) -> set:
-    series = network.getSeriesObj(seriesID=seriesID, logger=logger)
+    series = network.getSeriesObj(
+        seriesID=raws.parseSeriesID(
+            input=seriesID,
+            logger=logger,
+        ),
+        logger=logger,
+    )
     ids = set(())
     for i in series.work_list:
         ids.add(i.id)
@@ -175,7 +181,8 @@ group.add_argument(
     "--add-series",
     type=str,
     help="Get the IDs of all Works in a specified Series, then output them as a simple batch file.",
-    metavar="Output File",
+    metavar=("Output File", "Series ID/Link"),
+    nargs=2,
 )
 settings.parse()
 config = settings.settings
@@ -230,8 +237,8 @@ elif settings.args.polish_batch:
     )
 elif settings.args.add_series:
     setToBatch(
-        input=seriesToSet(seriesID=0, logger=logger),
-        output=settings.args.add_series,
+        input=seriesToSet(seriesID=settings.args.add_series[1], logger=logger),
+        output=settings.args.add_series[0],
         logger=logger,
         mode="a",
     )
