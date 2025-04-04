@@ -23,6 +23,32 @@ def parseWorkID(
     return id
 
 
+def parseSeriesID(
+    input: str,
+    logger: logging.Logger,
+) -> int:
+    try:
+        id = int(input.strip())
+    except ValueError:
+        id = seriesid_from_url(input.strip())
+    if not id:
+        raise Exception(f"Invalid input: {input}")
+    return id
+
+
+def seriesid_from_url(url):
+    split_url = url.split("/")
+    try:
+        index = split_url.index("series")
+    except ValueError:
+        return
+    if len(split_url) >= index + 1:
+        workid = split_url[index + 1].split("?")[0]
+        if workid.isdigit():
+            return int(workid)
+    return
+
+
 def checkUpdates(
     row1: dict,
     row2: dict,
