@@ -222,7 +222,6 @@ def downloadWork(
                         f"New raw downloaded for {work.id}",
                     ]
                 )
-                subprocess.run(["git", "-C", dirRaws, "push"])
             return True
     raise Exception(
         f"Could not finish downloading {work.title} after {retries} attempts."

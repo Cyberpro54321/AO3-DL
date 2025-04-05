@@ -3,6 +3,7 @@
 import datetime
 import logging
 import os.path
+import subprocess
 
 import AO3
 
@@ -14,6 +15,13 @@ import raws
 import settings
 
 parseWorkID = raws.parseWorkID
+
+
+def push(
+    dirRaws: str,
+    logger: logging.Logger,
+):
+    subprocess.run(["git", "-C", dirRaws, "push"])
 
 
 def main(
@@ -108,3 +116,4 @@ if __name__ == "__main__":
         database.initDB(filename=config["dbFileFull"], logger=logger)
     work.load_chapters()
     main(work=work, config=config, logger=logger)
+    push(dirRaws=config["dirRaws"], logger=logger)

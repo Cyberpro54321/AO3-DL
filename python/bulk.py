@@ -105,6 +105,8 @@ with concurrent.futures.ThreadPoolExecutor(
     for i in ids:
         pool.submit(primary, i)
 
+main.push(dirRaws=config["dirRaws"], logger=logger)
+
 for i in ids.difference(completed):
     errorMsg = f"Work {i} failed to complete"
     print(errorMsg)
