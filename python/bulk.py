@@ -108,10 +108,12 @@ with concurrent.futures.ThreadPoolExecutor(
 if config["useGit"]:
     main.acp(dirRaws=config["dirRaws"], logger=logger)
 
-for i in ids.difference(completed):
-    errorMsg = f"Work {i} failed to complete"
-    print(errorMsg)
-    logger.error(errorMsg)
+with open(f'{config["dirLogs"]}/incomplete-bulk.txt', "w") as errorFile:
+    for i in ids.difference(completed):
+        errorMsg = f"Work {i} failed to complete"
+        print(errorMsg)
+        logger.error(errorMsg)
+        errorFile.write(f"{i}\n")
 
 
 logger.info("Complete, bulk.py exiting")
