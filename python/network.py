@@ -178,7 +178,6 @@ def downloadWork(
     filename: str,
     logger: logging.Logger,
     retries: int = constants.loopRetries,
-    useGit: bool = False,
 ):
     loopNo = 1
     while loopNo <= retries:
@@ -204,24 +203,6 @@ def downloadWork(
             loopNo += 1
         else:
             loopNo = retries + 10
-            if useGit:
-                import subprocess
-                import os.path
-
-                dirRaws = os.path.dirname(filename)
-                subprocess.run(
-                    ["git", "-C", dirRaws, "add", os.path.basename(filename)]
-                )
-                subprocess.run(
-                    [
-                        "git",
-                        "-C",
-                        dirRaws,
-                        "commit",
-                        "-m",
-                        f"New raw downloaded for {work.id}",
-                    ]
-                )
             return True
     raise Exception(
         f"Could not finish downloading {work.title} after {retries} attempts."

@@ -17,10 +17,13 @@ import settings
 parseWorkID = raws.parseWorkID
 
 
-def push(
+def acp(
     dirRaws: str,
     logger: logging.Logger,
 ):
+    for i in os.listdir(dirRaws):
+        subprocess.run(["git", "-C", dirRaws, "add", i])
+    subprocess.run(["git", "-C", dirRaws, "commit", "-m", "commit message"])
     subprocess.run(["git", "-C", dirRaws, "push"])
 
 
@@ -45,13 +48,9 @@ def main(
             row1=raws.getRowFromFilename(filename=filename, logger=logger),
             row2=rowLive,
         ):
-            network.downloadWork(
-                work=work, filename=filename, logger=logger, useGit=config["useGit"]
-            )
+            network.downloadWork(work=work, filename=filename, logger=logger)
     else:
-        network.downloadWork(
-            work=work, filename=filename, logger=logger, useGit=config["useGit"]
-        )
+        network.downloadWork(work=work, filename=filename, logger=logger)
 
     soup = format.main(work=work, raw=filename, logger=logger, config=config)
     with open(
@@ -116,4 +115,5 @@ if __name__ == "__main__":
         database.initDB(filename=config["dbFileFull"], logger=logger)
     work.load_chapters()
     main(work=work, config=config, logger=logger)
-    push(dirRaws=config["dirRaws"], logger=logger)
+    if config["useGit"]:
+        acp(dirRaws=config["dirRaws"], logger=logger)
