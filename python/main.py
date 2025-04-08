@@ -43,7 +43,11 @@ def main(
         database.initDB(filename=config["dbFileFull"], logger=logger)
         rowDB = False
 
-    if os.path.exists(filename) and not forceDownloadNew:
+    if (
+        os.path.exists(filename)
+        and (os.path.getsize(filename))  # (bool(int)) equivilant to (int != 0)
+        and (not forceDownloadNew)
+    ):
         if raws.checkUpdates(
             row1=raws.getRowFromFilename(filename=filename, logger=logger),
             row2=rowLive,
