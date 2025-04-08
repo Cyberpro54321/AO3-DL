@@ -67,6 +67,12 @@ def setup():
             "y",
         ],
     )
+    parser.add_argument(
+        "--logs-level",
+        type=str,
+        help="Override what types of messages get written to log file.",
+        metavar="",
+    )
 
 
 def input(
@@ -141,7 +147,11 @@ def parse():
 
     settings["ao3PasswordFile"] = toAbsPath(config["ao3"]["passwordFile"])
 
-    if isinstance(config["logs"]["level"], str):
+    if args.logs_level:
+        logLevelInput = args.logs_level
+    else:
+        logLevelInput = config["logs"]["level"]
+    if isinstance(logLevelInput, str):
         for i in (
             ("debug", logging.DEBUG),
             ("info", logging.INFO),
@@ -149,10 +159,10 @@ def parse():
             ("error", logging.ERROR),
             ("critical", logging.CRITICAL),
         ):
-            if config["logs"]["level"].lower() == i[0]:
+            if logLevelInput.lower() == i[0]:
                 settings["logsLevel"] = i[1]
-    elif isinstance(config["logs"]["level"], int):
-        settings["logsLevel"] - config["logs"]["level"]
+    elif isinstance(logLevelInput, int):
+        settings["logsLevel"] = logLevelInput
 
     for i in ("dirRaws", "dirLogs"):
         if not os.path.exists(settings[i]):
