@@ -11,6 +11,7 @@
 - [X] Configurable Log Levels
 - [ ] Environmental Varuables?
 - [ ] Do something about cloudflare email protection
+- [ ] Don't re-download already downloaded images
 
 ## Bug Testing
 - [ ] Check works with no summaries
