@@ -27,6 +27,7 @@ def primary(id):
     global worksTotal
     worksComplete += 1
     logger.info(f"Completed {id} - Work {worksComplete}/{worksTotal}")
+    return True
 
 
 settings.setup()
@@ -99,11 +100,12 @@ else:
 worksComplete = 0
 worksTotal = len(ids)
 
+futures = {}
 with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix="worker"
 ) as pool:
     for i in ids:
-        pool.submit(primary, i)
+        futures[i] = pool.submit(primary, i)
 
 if config["useGit"]:
     main.acp(dirRaws=config["dirRaws"], logger=logger)
@@ -115,5 +117,10 @@ with open(f'{config["dirLogs"]}/incomplete-bulk.txt', "w") as errorFile:
         logger.error(errorMsg)
         errorFile.write(f"{i}\n")
 
+
+logger.info("Mostly complete, checking for exceptions from threads")
+
+for i in futures:
+    futures[i].result()
 
 logger.info("Complete, bulk.py exiting")
