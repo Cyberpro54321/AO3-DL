@@ -188,7 +188,7 @@ def downloadWork(
             )
             with open(file=filename, mode="wb") as file:
                 file.write(work.download("HTML"))
-        except AO3.utils.DownloadError as ex:
+        except (AO3.utils.DownloadError, AO3.utils.HTTPError) as ex:
             random.seed()
             pauseLength = random.randrange(35, 85)
             logger.warning(
