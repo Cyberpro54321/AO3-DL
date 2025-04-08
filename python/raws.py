@@ -68,7 +68,7 @@ def getPrefferedFilenameFromWorkID(
     logger: logging.Logger = logging.getLogger(__name__),
     extension: str = ".html",
 ):
-    return f"{id:<{constants.workIdMaxDigits}}{extension}"
+    return f"{id:0>{constants.workIdMaxDigits}}{extension}"
 
 
 def getRowFromFilename(
