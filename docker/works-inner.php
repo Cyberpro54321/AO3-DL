@@ -16,8 +16,8 @@ while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
   $chaptNumStr = "<td>";
   foreach ($row as $key => $value) {
     if ($key == "ID") {
-      $id = $value;
-      echo '<td>'.$value.'</td>';
+      $id = str_pad($value, 8, '0', STR_PAD_LEFT);;
+      echo '<td>'.$id.'</td>';
     } elseif ($key == "title") {
       echo '<td><a href=../'.$dirHTML.'/'.$id.'.html>'.$value.'</a></td>';
     } elseif ($key == "chaptersCount") {
