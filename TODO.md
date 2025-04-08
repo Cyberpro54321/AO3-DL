@@ -10,6 +10,7 @@
 ## Small Features
 - [X] Configurable Log Levels
 - [ ] Environmental Varuables?
+- [ ] Do something about cloudflare email protection
 
 ## Bug Testing
 - [ ] Check works with no summaries
