@@ -69,6 +69,13 @@ def downloadFile(
             urllib.request.urlretrieve(url, f"{dir}/{fileNameCore}.{extension}")
         except (urllib.error.HTTPError, urllib.error.URLError) as ex:
             random.seed()
+            if (
+                type(ex).__name__ == "HTTPError"
+                and parseResult.netloc[:18].lower() == "cdn.discordapp.com"
+            ):
+                logger.error("Discord CDN Image Hosting Detected")
+                loopNo += 100
+                continue
             if type(ex).__name__ == "HTTPError":
                 pauseLengthRange = (35, 85)
             else:

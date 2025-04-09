@@ -12,7 +12,7 @@
 - [ ] Environmental Varuables?
 - [ ] Do something about cloudflare email protection
 - [ ] Don't re-download already downloaded images
-- [ ] Detect broken image links hosted on Discord
+- [X] Detect broken image links hosted on Discord
 - [X] Detect deleted / privated works
 
 ## Bug Testing
