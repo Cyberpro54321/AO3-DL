@@ -114,6 +114,8 @@ if __name__ == "__main__":
         session=session,
         load_chapters=False,
     )
+    if work is False:
+        raise Exception
 
     if not os.path.exists(config["dbFileFull"]):
         database.initDB(filename=config["dbFileFull"], logger=logger)

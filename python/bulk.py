@@ -19,6 +19,8 @@ def primary(id):
         session=session,
         load_chapters=False,
     )
+    if work is False:
+        return False
     logger.info(f"Got AO3.Work object for {id}")
     main.main(work=work, config=config, logger=logger, forceDownloadNew=download_all)
     global completed

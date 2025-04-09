@@ -13,8 +13,7 @@
 - [ ] Do something about cloudflare email protection
 - [ ] Don't re-download already downloaded images
 - [ ] Detect broken image links hosted on Discord
-- [ ] Detect deleted works
-- [ ] Detect privated works
+- [X] Detect deleted / privated works
 
 ## Bug Testing
 - [ ] Check works with no summaries

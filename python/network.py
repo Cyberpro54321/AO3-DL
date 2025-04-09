@@ -140,6 +140,7 @@ def getWorkObjFromId(
     load_chapters=True,
 ):
     loopNo = 1
+    errors = {}
     while loopNo <= retries:
         try:
             logger.log(
@@ -156,8 +157,20 @@ def getWorkObjFromId(
             AttributeError,
             requests.exceptions.ConnectionError,
         ) as ex:
+            errors[loopNo] = type(ex).__name__
+            if loopNo > 10:
+                attErrs = 0
+                for i in errors:
+                    if errors[i] == "AttributeError":
+                        attErrs += 1
+                if attErrs > (0.9 * loopNo):
+                    logger.error(f"Work ID {id} seems to be unavailable")
+                    return False
             random.seed()
-            pauseLength = random.randrange(35, 85)
+            if type(ex).__name__ == "AttributeError":
+                pauseLength = random.randrange(5, 15)
+            else:
+                pauseLength = random.randrange(35, 85)
             logger.warning(
                 constants.loopErrorTemplate.format(
                     f"getting work object for id {id}",
