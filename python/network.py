@@ -11,6 +11,8 @@ import AO3
 
 import constants
 
+import requests.exceptions
+
 
 def getSeriesObj(
     seriesID: str,
@@ -152,6 +154,7 @@ def getWorkObjFromId(
             ConnectionError,
             AO3.utils.DownloadError,
             AttributeError,
+            requests.exceptions.ConnectionError,
         ) as ex:
             random.seed()
             pauseLength = random.randrange(35, 85)
@@ -188,7 +191,7 @@ def downloadWork(
             )
             with open(file=filename, mode="wb") as file:
                 file.write(work.download("HTML"))
-        except (AO3.utils.DownloadError, AO3.utils.HTTPError) as ex:
+        except (AO3.utils.DownloadError, AO3.utils.HTTPError, ConnectionError) as ex:
             random.seed()
             pauseLength = random.randrange(35, 85)
             logger.warning(
