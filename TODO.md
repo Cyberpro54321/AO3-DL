@@ -6,6 +6,7 @@
 - [X] Image Downloading
 - [ ] SQLite Series Table
 - [ ] PHP Series Page
+- [ ] Incomplete Series Detector
 
 ## Small Features
 - [X] Configurable Log Levels
