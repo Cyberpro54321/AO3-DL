@@ -2,6 +2,7 @@
 
 import base64
 import logging
+import os.path
 import random
 import time
 import urllib.parse
@@ -59,6 +60,9 @@ def downloadFile(
     fileNameCore = base64.urlsafe_b64encode(
         url[int((-252 + len(extension)) * 0.75):].encode()
     ).decode()
+    fileName = f"{fileNameCore}.{extension}"
+    if os.path.exists(fileName) and os.path.getsize(fileName):
+        return fileName
     loopNo = 1
     while loopNo <= retries:
         try:
@@ -66,7 +70,7 @@ def downloadFile(
                 (10 + (20 * int(loopNo != 1))),
                 f"(Attempt {loopNo}): Downloading file {url}",
             )
-            urllib.request.urlretrieve(url, f"{dir}/{fileNameCore}.{extension}")
+            urllib.request.urlretrieve(url, f"{dir}/{fileName}")
         except (urllib.error.HTTPError, urllib.error.URLError) as ex:
             random.seed()
             if (
@@ -96,7 +100,7 @@ def downloadFile(
             logger.info(
                 f"Successfully downloaded file {url} as\n{fileNameCore}.{extension}"
             )
-            return f"{fileNameCore}.{extension}"
+            return fileName
     return url
 
 
