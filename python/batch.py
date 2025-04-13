@@ -11,6 +11,7 @@ import network
 def parseBatchFile(
     file: str,
     logger: logging.Logger,
+    ao3Session: AO3.Session = None,
 ) -> set:
     ids = set(())
     lines = set(())
@@ -18,7 +19,7 @@ def parseBatchFile(
         for line in inputFile:
             lines.add(line)
     for line in lines:
-        for id in parseBatchLine(line=line, logger=logger):
+        for id in parseBatchLine(line=line, logger=logger, ao3Session=ao3Session):
             ids.add(id)
     return ids
 
@@ -26,6 +27,7 @@ def parseBatchFile(
 def parseBatchLine(
     line: str,
     logger: logging.Logger,
+    ao3Session: AO3.Session = None,
 ) -> set:
     ids = set(())
     try:
@@ -48,7 +50,9 @@ def parseBatchLine(
         elif indexS and len(split) >= indexS:
             id = split[indexS].split("?")[0]
             series = network.getSeriesObj(seriesID=id, logger=logger)
-            for id in getWorkIdsFromSeriesObj(series=series, logger=logger):
+            for id in getWorkIdsFromSeriesObj(
+                series=series, logger=logger, ao3Session=ao3Session
+            ):
                 ids.add(id)
     return ids
 
@@ -56,6 +60,7 @@ def parseBatchLine(
 def getWorkIdsFromSeriesObj(
     series: AO3.Series,
     logger: logging.Logger,
+    ao3Session: AO3.Session = None,
 ) -> set:
     pagesSet = divmod(series.nworks, constants.ao3WorksPerSeriesPage)
     pagesCount = pagesSet[0] + int(bool(pagesSet[1]))
@@ -67,6 +72,7 @@ def getWorkIdsFromSeriesObj(
             seriesX = network.getSeriesObj(
                 seriesID=f"{series.id}?page={i}",
                 logger=logger,
+                ao3Session=ao3Session,
             )
             for j in seriesX.work_list:
                 ids.add(j.id)

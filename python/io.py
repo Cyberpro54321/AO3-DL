@@ -193,20 +193,24 @@ elif settings.args.csv_from_db:
         logger=logger,
     )
 elif settings.args.polish_batch:
+    ao3Session = network.login(config=config, logger=logger)
     setToBatch(
         input=batch.parseBatchFile(
             file=settings.args.polish_batch,
             logger=logger,
+            ao3Session=ao3Session,
         ),
         output=settings.args.polish_batch,
         logger=logger,
     )
 elif settings.args.add_series:
+    ao3Session = network.login(config=config, logger=logger)
     setToBatch(
         input=batch.getWorkIdsFromSeriesObj(
             series=network.getSeriesObj(
                 seriesID=settings.add_series[1],
                 logger=logger,
+                ao3Session=ao3Session,
             ),
             logger=logger,
         ),
