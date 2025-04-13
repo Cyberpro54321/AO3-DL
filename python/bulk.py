@@ -73,18 +73,7 @@ logger = getLogger.getLogger(
     includeThreadName=True,
 )
 
-if config["ao3DoLogin"]:
-    with open(config["ao3UsernameFile"]) as file:
-        ao3Username = file.readline().strip()
-    with open(config["ao3PasswordFile"]) as file:
-        ao3Password = file.readline().strip()
-    session = network.getSessionObj(
-        username=ao3Username, password=ao3Password, logger=logger
-    )
-    del ao3Username
-    del ao3Password
-else:
-    session = None
+session = network.login(config=config, logger=logger)
 
 
 if not os.path.exists(config["dbFileFull"]):

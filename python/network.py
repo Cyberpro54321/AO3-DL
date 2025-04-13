@@ -18,22 +18,24 @@ import requests.exceptions
 def getSeriesObj(
     seriesID: str,
     logger: logging.Logger,
-    retries=constants.loopRetries,
+    retries: int = constants.loopRetries,
+    ao3Session: AO3.Session = None,
 ) -> AO3.Series:
     loopNo = 1
     while loopNo <= retries:
         try:
             logger.log(
                 (10 + (20 * int(loopNo > 9))),
-                f"(Attempt {loopNo}): Getting AO3.series object",
+                f"(Attempt {loopNo}): Getting AO3.Series object {seriesID}",
             )
-            series = AO3.Series(seriesID)
-        except ConnectionError as ex:
+            series = AO3.Series(seriesID, session=ao3Session)
+            series.nworks
+        except (ConnectionError, AttributeError) as ex:
             random.seed()
-            pauseLength = random.randrange(35, 85)
+            pauseLength = random.randrange(5, 15)
             logger.warning(
                 constants.loopErrorTemplate.format(
-                    "getting ao3.series object",
+                    f"getting ao3.Series object {seriesID}",
                     pauseLength,
                     type(ex).__name__,
                     ex.args,
@@ -42,9 +44,12 @@ def getSeriesObj(
             time.sleep(pauseLength)
             loopNo += 1
         else:
+            logger.info(f"Got AO3.Series object {seriesID}")
             loopNo = retries + 10
             return series
-    raise Exception(f"Could not get AO3.series object after {retries} attempts.")
+    raise Exception(
+        f"Could not get AO3.Series object {seriesID} after {retries} attempts."
+    )
 
 
 def downloadFile(
@@ -140,6 +145,25 @@ def getSessionObj(
             loopNo = retries + 10
             return session
     raise Exception(f"Could not get AO3 session object after {retries} attempts.")
+
+
+def login(
+    config: dict,
+    logger: logging.Logger,
+) -> AO3.Session:
+    if config["ao3DoLogin"]:
+        with open(config["ao3UsernameFile"]) as file:
+            ao3Username = file.readline().strip()
+        with open(config["ao3PasswordFile"]) as file:
+            ao3Password = file.readline().strip()
+        session = getSessionObj(
+            username=ao3Username, password=ao3Password, logger=logger
+        )
+        del ao3Username
+        del ao3Password
+    else:
+        session = None
+    return session
 
 
 def getWorkObjFromId(
