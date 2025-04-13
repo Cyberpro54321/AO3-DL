@@ -7,6 +7,7 @@ import os.path
 import AO3
 
 import batch
+import constants
 import database
 import getLogger
 import main
@@ -101,7 +102,7 @@ incompleteImg = set(())
 
 futures = {}
 with concurrent.futures.ThreadPoolExecutor(
-    max_workers=10, thread_name_prefix="worker"
+    max_workers=10, thread_name_prefix=constants.threadNameBulk
 ) as pool:
     for i in ids:
         futures[i] = pool.submit(primary, i)
