@@ -253,7 +253,7 @@ def doChapter(
     divChaptersRaw: bs4.element.Tag,
     logger: logging.Logger,
 ):
-    logger.info(f"{chapter.title}: {chapter.number}")
+    logger.debug(f"{chapter.title}: {chapter.number}")
     currentChapterDiv = divChapters.append(
         soup.new_tag(
             "div", id="chapter-" + str(chapter.number), attrs={"class": "chapter"}
