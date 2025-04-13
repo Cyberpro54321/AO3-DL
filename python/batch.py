@@ -49,7 +49,9 @@ def parseBatchLine(
                 ids.add(id)
         elif indexS and len(split) >= indexS:
             id = split[indexS].split("?")[0]
-            series = network.getSeriesObj(seriesID=id, logger=logger)
+            series = network.getSeriesObj(
+                seriesID=id, logger=logger, ao3Session=ao3Session
+            )
             for id in getWorkIdsFromSeriesObj(
                 series=series, logger=logger, ao3Session=ao3Session
             ):
