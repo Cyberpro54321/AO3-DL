@@ -18,7 +18,7 @@ def parseBatchFile(
         for line in inputFile:
             lines.add(line)
     for line in lines:
-        for id in parseBatchLine(input=line, logger=logger):
+        for id in parseBatchLine(line=line, logger=logger):
             ids.add(id)
     return ids
 
@@ -32,6 +32,8 @@ def parseBatchLine(
         ids.add(int(line.strip()))
     except ValueError:
         split = line.split("/")
+        indexW = 0
+        indexS = 0
         try:
             indexW = split.index("works") + 1
         except ValueError:
