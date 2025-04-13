@@ -15,6 +15,7 @@
 - [ ] Don't re-download already downloaded images
 - [X] Detect broken image links hosted on Discord
 - [X] Detect deleted / privated works
+- [ ] Filesize check
 
 ## Bug Testing
 - [ ] Check works with no summaries

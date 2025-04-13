@@ -57,11 +57,15 @@ def main(
         network.downloadWork(work=work, filename=filename, logger=logger)
 
     soup = format.main(work=work, raw=filename, logger=logger, config=config)
+    outFileFull = f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     with open(
-        file=f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}",
+        file=outFileFull,
         mode="w",
     ) as out:
         out.write(soup.prettify(formatter="html5"))
+
+    if os.path.getsize(outFileFull) < os.path.getsize(filename):
+        logger.error(f"Work {work.id} Output file is smaller than raw file.")
 
     if rowDB:
         database.updateWork(
