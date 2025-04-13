@@ -193,7 +193,16 @@ elif settings.args.csv_from_db:
         logger=logger,
     )
 elif settings.args.polish_batch:
-    ao3Session = network.login(config=config, logger=logger)
+    seriesPresent = False
+    with open(settings.args.polish_batch) as file:
+        for i in file:
+            if i.find("series") != -1:
+                seriesPresent = True
+                break
+    if seriesPresent:
+        ao3Session = network.login(config=config, logger=logger)
+    else:
+        ao3Session = None
     setToBatch(
         input=batch.parseBatchFile(
             file=settings.args.polish_batch,
