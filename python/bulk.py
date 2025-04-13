@@ -103,7 +103,7 @@ with concurrent.futures.ThreadPoolExecutor(
 if config["useGit"]:
     main.acp(dirRaws=config["dirRaws"], logger=logger)
 
-with open(f'{config["dirLogs"]}/incomplete-bulk.txt', "w") as errorFile:
+with open(f'{config["dirLogs"]}/err-bulk-workIncomplete.txt', "w") as errorFile:
     for i in ids.difference(completed):
         errorMsg = f"Work {i} failed to complete"
         print(errorMsg)
