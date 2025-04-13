@@ -3,6 +3,7 @@
 import datetime
 import logging
 import os.path
+import threading
 
 import AO3
 import bs4
@@ -326,28 +327,43 @@ def getImages(
     id: int,
     logger: logging.Logger,
 ) -> (bs4.BeautifulSoup, set):
+    import concurrent.futures
+
+    srcSet = set(())
+    srcDict = {}
     fails = set(())
-    filesDownloaded = {}
-    for img in soup.findAll("img"):
+
+    for img in soup.find_all("img"):
         if "src" in img.attrs:
-            if img.attrs["src"] in filesDownloaded.keys():
-                img.attrs["src"] = filesDownloaded[img.attrs["src"]]
-            else:
-                filename = network.downloadFile(
-                    url=img.attrs["src"], dir=f"{imgDir}/{id}", logger=logger
+            srcSet.add(img.attrs["src"])
+
+    threadNoRaw = threading.current_thread().name[-1:]
+    if threadNoRaw.isdigit():
+        threadNo = threadNoRaw
+    else:
+        threadNo = "M"
+    del threadNoRaw
+    futures = {}
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=20, thread_name_prefix=f"img-{threadNo}"
+    ) as pool:
+        for src in srcSet:
+            futures[src] = pool.submit(
+                network.downloadFile, src, f"{imgDir}/{id}", logger
+            )
+    for i in futures:
+        srcDict[i] = futures[i].result()
+    for img in soup.find_all("img"):
+        if "src" in img.attrs:
+            if img.attrs["src"] == srcDict[img.attrs["src"]]:
+                fails.add(img.attrs["src"])
+                logger.error(
+                    f"Failed to download image {img.attrs['src']}, leaving link to externally-hosted version."
                 )
-                if filename == img.attrs["src"]:
-                    logger.error(
-                        f"Failed to download image {filename}, leaving link to externally-hosted version."
-                    )
-                    relpath = filename
-                    fails.add(filename)
-                else:
-                    relpath = f"../{imgDir.split('/')[-1]}/{id}/{filename}"
-                filesDownloaded[img.attrs["src"]] = relpath
-                img.attrs["src"] = relpath
-    if len(filesDownloaded) > 1:
-        logger.info(f"Finished downloading {len(filesDownloaded)} images for work {id}")
+            else:
+                img.attrs["src"] = (
+                    f"../{imgDir.split('/')[-1]}/{id}/{srcDict[img.attrs['src']]}"
+                )
     return soup, fails
 
 
@@ -380,6 +396,7 @@ def main(
     logger: logging.Logger,
     config: dict = {},
 ) -> (bs4.BeautifulSoup, set):
+    setErrImg = []
     if not config:
         import settings
 
