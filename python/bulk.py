@@ -4,6 +4,8 @@ import concurrent.futures
 import datetime
 import os.path
 
+import AO3
+
 import database
 import getLogger
 import main
@@ -123,6 +125,12 @@ with open(f'{config["dirLogs"]}/incomplete-bulk.txt', "w") as errorFile:
 logger.info("Mostly complete, checking for exceptions from threads")
 
 for i in futures:
-    futures[i].result()
+    try:
+        futures[i].result()
+    except AO3.utils.InvalidIdError:
+        errStr = f"WorkID {i} not found (Error 404)"
+        print(errStr)
+        logger.error(errStr)
+        del errStr
 
 logger.info("Complete, bulk.py exiting")
