@@ -78,6 +78,7 @@ def downloadFile(
             urllib.request.urlretrieve(url, f"{dir}/{fileName}")
         except (urllib.error.HTTPError, urllib.error.URLError) as ex:
             random.seed()
+            badHost = False
             for i in (
                 ("cdn.discordapp.com", "Discord CDN"),
                 ("i.imgur.com", "Imgur"),
@@ -86,9 +87,11 @@ def downloadFile(
                     type(ex).__name__ == "HTTPError"
                     and parseResult.netloc[: len(i[0])].lower() == i[0].lower()
                 ):
-                    logger.error(f"{i[1]} Image Hosting Detected")
-                    loopNo += 100
-                    continue
+                    badHost = True
+            if badHost:
+                logger.error(f"{i[1]} Image Hosting Detected")
+                loopNo += 100
+                continue
             if type(ex).__name__ == "HTTPError":
                 pauseLengthRange = (35, 85)
             else:
