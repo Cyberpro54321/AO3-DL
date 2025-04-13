@@ -52,8 +52,10 @@ def main(
             row2=rowLive,
         ):
             network.downloadWork(work=work, filename=filename, logger=logger)
+            work.load_chapters()
     else:
         network.downloadWork(work=work, filename=filename, logger=logger)
+        work.load_chapters()
 
     soup = format.main(work=work, raw=filename, logger=logger, config=config)
     outFileFull = f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
@@ -129,3 +131,4 @@ if __name__ == "__main__":
     main(work=work, config=config, logger=logger)
     if config["useGit"]:
         acp(dirRaws=config["dirRaws"], logger=logger)
+    logger.info("Complete, main.py stopping")
