@@ -81,7 +81,9 @@ def downloadFile(
             badHost = False
             for i in (
                 ("cdn.discordapp.com", "Discord CDN"),
+                ("media.discordapp.net", "Discord CDN"),
                 ("i.imgur.com", "Imgur"),
+                ("imgur.com", "Imgur"),
             ):
                 if (
                     type(ex).__name__ == "HTTPError"
