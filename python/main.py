@@ -31,7 +31,7 @@ def main(
     config: dict,
     logger: logging.Logger,
     forceDownloadNew=False,
-):
+) -> set:
     filename = f"{config['dirRaws']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     rowLive = database.workToRow(work=work)
     if os.path.exists(config["dbFileFull"]):
@@ -57,7 +57,7 @@ def main(
         network.downloadWork(work=work, filename=filename, logger=logger)
         work.load_chapters()
 
-    soup = format.main(work=work, raw=filename, logger=logger, config=config)
+    soup, setErrImg = format.main(work=work, raw=filename, logger=logger, config=config)
     outFileFull = f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     with open(
         file=outFileFull,
@@ -76,6 +76,8 @@ def main(
         database.newWork(
             id=work.id, filename=config["dbFileFull"], row=rowLive, logger=logger
         )
+
+    return setErrImg
 
 
 if __name__ == "__main__":
@@ -117,7 +119,10 @@ if __name__ == "__main__":
     if not os.path.exists(config["dbFileFull"]):
         database.initDB(filename=config["dbFileFull"], logger=logger)
     work.load_chapters()
-    main(work=work, config=config, logger=logger)
+    setErrImg = main(work=work, config=config, logger=logger)
+    with open(f"{config['dirLogs']}/err-main-imgIncomplete.log", "w") as fileErrImg:
+        for i in setErrImg:
+            fileErrImg.write(f"{i}\n")
     if config["useGit"]:
         acp(dirRaws=config["dirRaws"], logger=logger)
     logger.info("Complete, main.py stopping")

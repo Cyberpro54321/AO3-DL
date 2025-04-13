@@ -25,7 +25,12 @@ def primary(id):
     if work is False:
         return False
     logger.info(f"Got AO3.Work object for {id}")
-    main.main(work=work, config=config, logger=logger, forceDownloadNew=download_all)
+    setErrImg = main.main(
+        work=work, config=config, logger=logger, forceDownloadNew=download_all
+    )
+    global incompleteImg
+    for i in setErrImg:
+        incompleteImg.add(i)
     global completed
     completed.add(id)
     global worksComplete
@@ -92,6 +97,7 @@ else:
 
 worksComplete = 0
 worksTotal = len(ids)
+incompleteImg = set(())
 
 futures = {}
 with concurrent.futures.ThreadPoolExecutor(
@@ -109,6 +115,11 @@ with open(f'{config["dirLogs"]}/err-bulk-workIncomplete.txt', "w") as errorFile:
         print(errorMsg)
         logger.error(errorMsg)
         errorFile.write(f"{i}\n")
+
+
+with open(f"{config['dirLogs']}/err-bulk-imgIncomplete.log", "w") as fileErrImg:
+    for i in incompleteImg:
+        fileErrImg.write(f"{i}\n")
 
 
 logger.info("Mostly complete, checking for exceptions from threads")

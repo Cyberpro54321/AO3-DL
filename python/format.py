@@ -325,7 +325,8 @@ def getImages(
     imgDir: str,
     id: int,
     logger: logging.Logger,
-):
+) -> (bs4.BeautifulSoup, set):
+    fails = set(())
     filesDownloaded = {}
     for img in soup.findAll("img"):
         if "src" in img.attrs:
@@ -340,13 +341,14 @@ def getImages(
                         f"Failed to download image {filename}, leaving link to externally-hosted version."
                     )
                     relpath = filename
+                    fails.add(filename)
                 else:
                     relpath = f"../{imgDir.split('/')[-1]}/{id}/{filename}"
                 filesDownloaded[img.attrs["src"]] = relpath
                 img.attrs["src"] = relpath
     if len(filesDownloaded) > 1:
         logger.info(f"Finished downloading {len(filesDownloaded)} images for work {id}")
-    return soup
+    return soup, fails
 
 
 def finish(
@@ -377,7 +379,7 @@ def main(
     raw: str,
     logger: logging.Logger,
     config: dict = {},
-):
+) -> (bs4.BeautifulSoup, set):
     if not config:
         import settings
 
@@ -406,7 +408,7 @@ def main(
         logger=logger,
     )
     if config["doImageDownloading"]:
-        soup = getImages(
+        soup, setErrImg = getImages(
             soup=soup,
             imgDir=f"{config['dirOutput']}/{config['dirOutImg']}",
             id=work.id,
@@ -417,4 +419,4 @@ def main(
         work=work,
         logger=logger,
     )
-    return soup
+    return soup, setErrImg
