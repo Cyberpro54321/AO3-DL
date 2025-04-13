@@ -7,14 +7,13 @@ import subprocess
 
 import AO3
 
+import batch
 import database
 import format
 import getLogger
 import network
 import raws
 import settings
-
-parseWorkID = raws.parseWorkID
 
 
 def acp(
@@ -113,7 +112,10 @@ if __name__ == "__main__":
     else:
         session = None
     work = network.getWorkObjFromId(
-        id=parseWorkID(input=settings.args.input, logger=logger),
+        id=batch.parseBatchLine(
+            line=settings.args.input,
+            logger=logger,
+        )[0],
         logger=logger,
         session=session,
         load_chapters=False,

@@ -6,6 +6,7 @@ import os.path
 
 import AO3
 
+import batch
 import database
 import getLogger
 import main
@@ -92,12 +93,11 @@ if not os.path.exists(config["dbFileFull"]):
 ids = set(())
 completed = set(())
 if from_batch:
-    batchBuffer = []
-    with open(os.path.expanduser(from_batch)) as batchfile:
-        for i in batchfile:
-            batchBuffer.append(i.strip())
-    for i in batchBuffer:
-        ids.add(main.parseWorkID(input=str(i), logger=logger))
+    for id in batch.parseBatchFile(
+        file=os.path.expanduser(from_batch),
+        logger=logger,
+    ):
+        ids.add(id)
 else:
     ids = database.getWorkIdSet(filename=config["dbFileFull"], logger=logger)
 

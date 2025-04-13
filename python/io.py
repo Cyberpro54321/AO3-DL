@@ -5,7 +5,7 @@ import datetime
 import os.path
 import logging
 
-import constants
+import batch
 import database
 import getLogger
 import network
@@ -40,27 +40,6 @@ def rawsToSet(
     return ids
 
 
-def batchToSet(
-    input: str,
-    logger: logging.Logger,
-) -> set:
-    ids = {}
-    with open(input) as inputFile:
-        items = 0
-        for i in inputFile:
-            items += 1
-        digits = len(str(items))
-    with open(input) as inputFile:
-        for num, i in enumerate(inputFile):
-            id = raws.parseWorkID(input=i, logger=logger)
-            if ids.get(id):
-                errStr = f"Duplicate found: line [{ids[id]:<{digits}}] is the same as line [{num:<{digits}}] ({id:<{constants.workIdMaxDigits}})"
-                print(errStr)
-                logger.warning(errStr)
-            ids[id] = num
-    return set(ids.keys())
-
-
 def dbToDict(
     dbFileFull: str,
     logger: logging.Logger,
@@ -83,34 +62,6 @@ def dbToDict(
             "dateLastEdited": i[10],
         }
     return mainDict
-
-
-def seriesToSet(
-    seriesID: str,
-    logger: logging.Logger,
-) -> set:
-    seriesIDInt = raws.parseSeriesID(
-        input=seriesID,
-        logger=logger,
-    )
-    series1 = network.getSeriesObj(
-        seriesID=seriesIDInt,
-        logger=logger,
-    )
-    pagesSet = divmod(series1.nworks, constants.ao3WorksPerSeriesPage)
-    pagesCount = pagesSet[0] + int(bool(pagesSet[1]))
-    ids = set(())
-    for i in series1.work_list:
-        ids.add(i.id)
-    if pagesCount != 1 and len(ids) == constants.ao3WorksPerSeriesPage:
-        for i in range(2, pagesCount + 1):
-            seriesX = network.getSeriesObj(
-                seriesID=f"{seriesIDInt}?page={i}",
-                logger=logger,
-            )
-            for j in seriesX.work_list:
-                ids.add(j.id)
-    return ids
 
 
 ################################
@@ -243,8 +194,8 @@ elif settings.args.csv_from_db:
     )
 elif settings.args.polish_batch:
     setToBatch(
-        input=batchToSet(
-            input=settings.args.polish_batch,
+        input=batch.parseBatchFile(
+            file=settings.args.polish_batch,
             logger=logger,
         ),
         output=settings.args.polish_batch,
@@ -252,7 +203,13 @@ elif settings.args.polish_batch:
     )
 elif settings.args.add_series:
     setToBatch(
-        input=seriesToSet(seriesID=settings.args.add_series[1], logger=logger),
+        input=batch.getWorkIdsFromSeriesObj(
+            series=network.getSeriesObj(
+                seriesID=settings.add_series[1],
+                logger=logger,
+            ),
+            logger=logger,
+        ),
         output=settings.args.add_series[0],
         logger=logger,
         mode="a",
