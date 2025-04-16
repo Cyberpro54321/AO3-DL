@@ -52,11 +52,10 @@ def main(
             row2=rowLive,
         ):
             network.downloadWork(work=work, filename=filename, logger=logger)
-            work.load_chapters()
     else:
         network.downloadWork(work=work, filename=filename, logger=logger)
-        work.load_chapters()
 
+    work.load_chapters()
     soup, setErrImg = format.main(work=work, raw=filename, logger=logger, config=config)
     outFileFull = f"{config['dirOutput']}/{config['dirOutHtml']}/{raws.getPrefferedFilenameFromWorkID(id=work.id, logger=logger)}"
     with open(
@@ -121,7 +120,6 @@ if __name__ == "__main__":
 
     if not os.path.exists(config["dbFileFull"]):
         database.initDB(filename=config["dbFileFull"], logger=logger)
-    work.load_chapters()
     setErrImg = main(work=work, config=config, logger=logger)
     with open(f"{config['dirLogs']}/err-main-imgIncomplete.log", "w") as fileErrImg:
         for i in setErrImg:
