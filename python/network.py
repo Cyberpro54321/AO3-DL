@@ -58,7 +58,6 @@ def downloadFile(
     logger: logging.Logger,
     retries: int = 3,
 ) -> str:
-    logger.info(f"Downloading file {url}")
     parseResult = urllib.parse.urlparse(url=url)
     extension = parseResult.path.split("/")[-1].split(".")[-1]
     # above will shit the bed if given a directory URL instead of a file url. Not important for intended usecase
@@ -68,6 +67,7 @@ def downloadFile(
     fileName = f"{fileNameCore}.{extension}"
     if os.path.exists(fileName) and os.path.getsize(fileName):
         return fileName
+    logger.info(f"Downloading file {url}")
     loopNo = 1
     while loopNo <= retries:
         try:
@@ -78,7 +78,7 @@ def downloadFile(
             urllib.request.urlretrieve(url, f"{dir}/{fileName}")
         except (urllib.error.HTTPError, urllib.error.URLError) as ex:
             random.seed()
-            badHost = False
+            badHost = ""
             for i in (
                 ("cdn.discordapp.com", "Discord CDN"),
                 ("media.discordapp.net", "Discord CDN"),
@@ -89,9 +89,9 @@ def downloadFile(
                     type(ex).__name__ == "HTTPError"
                     and parseResult.netloc[: len(i[0])].lower() == i[0].lower()
                 ):
-                    badHost = True
+                    badHost = i[1]
             if badHost:
-                logger.error(f"{i[1]} Image Hosting Detected")
+                logger.error(f"{badHost} Image Hosting Detected")
                 loopNo += 100
                 continue
             if type(ex).__name__ == "HTTPError":
