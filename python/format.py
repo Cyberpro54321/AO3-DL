@@ -219,18 +219,8 @@ def userstuff_loop(
     if work.oneshot:
         allChaptersNumbered[1] = divChaptersRaw.find("div", class_="userstuff")
     else:
-        allChapters = divChaptersRaw.find_all("div", class_="userstuff")
-        for i in work.chapters:
-            for j in allChapters:
-                text = ""
-                for k in j.find_all(("p", "center")):
-                    text += k.getText().replace("\n", "") + "\n"
-                    if isinstance(k.next_sibling, bs4.element.NavigableString):
-                        text += str(k.next_sibling)
-                if text == i.text:
-                    allChaptersNumbered[i.number] = j
-                    break
-        del allChapters
+        for num, i in enumerate(divChaptersRaw.find_all("div", class_="userstuff")):
+            allChaptersNumbered[num + 1] = i
 
     for i in work.chapters:
         doChapter(
