@@ -104,11 +104,14 @@ if __name__ == "__main__":
     )
 
     session = network.login(config=config, logger=logger)
+    for i in batch.parseBatchLine(
+        line=settings.args.input,
+        logger=logger,
+    ):
+        workID = i
+        break
     work = network.getWorkObjFromId(
-        id=batch.parseBatchLine(
-            line=settings.args.input,
-            logger=logger,
-        )[0],
+        id=workID,
         logger=logger,
         session=session,
         load_chapters=False,
