@@ -75,7 +75,11 @@ def main(
         )
     else:
         with open(
-            raws.getPrefferedFilenameFromWorkID(
+            config["dirOutput"]
+            + "/"
+            + config["dirWorkskins"]
+            + "/"
+            + raws.getPrefferedFilenameFromWorkID(
                 id=work.id, logger=logger, extension=".css"
             )
         ) as cssOut:
