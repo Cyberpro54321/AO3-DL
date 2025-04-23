@@ -67,6 +67,20 @@ def main(
     if os.path.getsize(outFileFull) < os.path.getsize(filename):
         logger.error(f"Work {work.id} Output file is smaller than raw file.")
 
+    try:
+        work.workskin
+    except AttributeError:
+        logger.debug(
+            "You're using a version of ao3_api that doesn't yet support Workskin downloading."
+        )
+    else:
+        with open(
+            raws.getPrefferedFilenameFromWorkID(
+                id=work.id, logger=logger, extension=".css"
+            )
+        ) as cssOut:
+            cssOut.write(work.workskin)
+
     if rowDB:
         database.updateWork(
             id=work.id, filename=config["dbFileFull"], row=rowLive, logger=logger
