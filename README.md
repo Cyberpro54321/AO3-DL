@@ -6,6 +6,7 @@ This project isn't in a stable state, and I can't gaurentee that the version you
 If you do choose to use this project in its current state please be sure to contact me with any errors you encounter, any questions you have, and any ideas for additions or improvements you have.
 
 ## Usage
+### Single
 To download a singular work, for example `https://archiveofourown.org/works/27665101`, use `main.py`. You can use a link to the work:
 ```bash
 ./main.py https://archiveofourown.org/works/27665101
@@ -15,9 +16,10 @@ or just the Work ID:
 ./main.py 27665101
 ```
 
+### Bulk
 To download a large number of works at once, use `bulk.py`, such as:
 ```bash
-./bulk.py --from-batch batch.txt
+./bulk.py batch.txt
 ```
 where `batch.txt` looks something like:
 ```
@@ -32,6 +34,7 @@ https://archiveofourown.org/works/35583634
 https://archiveofourown.org/works/19055431
 ```
 
+### Series
 `bulk.py` also supports downloading all the works in a particular series. So the following two batch files, for example, are effectively the same:
 ```
 https://archiveofourown.org/series/2429515

@@ -26,9 +26,7 @@ def primary(id):
     if work is False:
         return False
     logger.info(f"Got AO3.Work object for {id}")
-    setErrImg = main.main(
-        work=work, config=config, logger=logger, forceDownloadNew=download_all
-    )
+    setErrImg = main.main(work=work, config=config, logger=logger)
     global incompleteImg
     for i in setErrImg:
         incompleteImg.add(i)
@@ -42,28 +40,16 @@ def primary(id):
 
 
 settings.setup()
-groupAction = settings.parser.add_mutually_exclusive_group(required=True)
-groupAction.add_argument(
-    "--download-updates",
-    action="store_true",
-    help="Go through all works in the database, then re-download and re-format any with updates since the version on file.",
-)
-groupAction.add_argument(
-    "--download-all",
-    action="store_true",
-    help="Re-download and re-format all works in database, even if no updates.",
-)
-groupAction.add_argument(
-    "--from-batch",
+settings.parser.add_argument(
+    "input",
     type=str,
-    help="Download and format all works in a specified batch file, without re-downloading any up-to-date Raws already present.",
-    metavar="FILE",
+    help="If present, download and format all works in the specified batch file. Otherwise re-downloads all works in database",
+    metavar="BATCH",
+    nargs="?",
+    default="",
 )
 settings.parse()
 config = settings.settings
-download_updates = settings.args.download_updates
-download_all = settings.args.download_all
-from_batch = settings.args.from_batch
 
 
 logCore = "bulk"
@@ -87,9 +73,9 @@ if not os.path.exists(config["dbFileFull"]):
 
 ids = set(())
 completed = set(())
-if from_batch:
+if settings.args.input:
     for id in batch.parseBatchFile(
-        file=os.path.expanduser(from_batch),
+        file=os.path.expanduser(settings.args.input),
         logger=logger,
     ):
         ids.add(id)
