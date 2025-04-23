@@ -46,6 +46,13 @@ https://archiveofourown.org/works/37130362
 https://archiveofourown.org/works/49109950
 ```
 
+### Check For Updates
+For various reasons, every work you download with `main.py` or `bulk.py` is saved to a database (`main.sqlite` by default).
+When you call `bulk.py` without specifying a batch file, it will go through every work saved in the database and re-download any works that've been updated since the last download.
+```bash
+./bulk.py
+```
+
 ## Contact
 Main source code repository and issue tracker at [Codeberg](https://codeberg.org/Cyberpro123/AO3-DL), mirror also available on [Github](https://github.com/Cyberpro54321/AO3-DL).
 
