@@ -7,6 +7,7 @@
 - [ ] SQLite Series Table
 - [ ] PHP Series Page
 - [ ] Incomplete Series Detector
+- [ ] HTML to other format converter?
 
 ## Small Features
 - [X] Configurable Log Levels
