@@ -164,6 +164,27 @@ def parse():
     elif isinstance(logLevelInput, int):
         settings["logsLevel"] = logLevelInput
 
+    for i in (
+        settings["dirRaws"],
+        f"{settings['dirOutput']}/{settings['dirOutHtml']}",
+        f"{settings['dirOutput']}/{settings['dirOutImg']}",
+        f"{settings['dirOutput']}/{settings['dirWorkskins']}",
+        f"{settings['dirOutput']}/{settings['dirAO3CSS']}",
+        settings["dirLogs"],
+        os.path.dirname(settings["ao3UsernameFile"]),
+        os.path.dirname(settings["ao3PasswordFile"]),
+    ):
+        os.makedirs(i, exist_ok=True)
+
+    if settings["ao3DoLogin"] and not (
+        os.path.exists(settings["ao3UsernameFile"])
+        and os.path.getsize(settings["ao3UsernameFile"])
+        and os.path.exists(settings["ao3PasswordFile"])
+        and os.path.getsize(settings["ao3PasswordFile"])
+    ):
+        settings["ao3DoLogin"] = False
+        print("ERROR: Username & Password files don't exist.")
+
     for i in ("dirRaws", "dirLogs"):
         if not os.path.exists(settings[i]):
             raise Exception(f"Specified directory doesn't exist: {settings[i]}")
