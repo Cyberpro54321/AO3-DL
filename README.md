@@ -77,4 +77,4 @@ Earlier or later versions of these projects may work, but I haven't done any tes
 2. (Optional) Change the settings in [config.ini](python/config.ini) to your liking.
 3. Run [setup.py](python/setup.py).
    - The contents of the `python` directory are 'portable', meaning they can go in any directory you like so long as they're all in the same directory.
-4. (Optional) Launch the web server using `docker compose up -d` in your terminal while in the same directory as [docker-compose.yaml](docker/docker-compose.yaml) and [default.conf](docker/default.conf). You can use any other web server you want if you already have a preference, so long as it supports PHP.
+4. (Optional, highly recommended) Start a simple web server with access to the 'Output' directory specified in `config.ini` (by default `~/Documents/AO3-DL/Output`). I recommend using [Docker Compose](https://docs.docker.com/engine/install/) with the provided [docker-compose.yaml](docker/docker-compose.yaml), but anything should work as long as it supports PHP.
