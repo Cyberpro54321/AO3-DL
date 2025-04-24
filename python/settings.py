@@ -122,7 +122,7 @@ def parse():
 
     settings["dirAO3CSS"] = config["output"]["ao3css"].strip("/")
 
-    settings["ao3cssMerged"] = config["ao3"].getboolean("cssMerged")
+    settings["ao3cssMerged"] = False
 
     settings["dbFileFull"] = toAbsPath(
         f'{settings["dirOutput"]}/{config["output"]["database"]}'
