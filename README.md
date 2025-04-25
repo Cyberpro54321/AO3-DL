@@ -75,6 +75,6 @@ Earlier or later versions of these projects may work, but I haven't done any tes
 ## Setup
 1. Download the project, either by downloading and extracting a `.zip` file or by running `git clone https://codeberg.org/Cyberpro123/AO3-DL.git` in your terminal / command line.
 2. (Optional) Change the settings in [config.ini](python/config.ini) to your liking.
-3. Run [setup.py](python/setup.py).
+3. Run [setup.py](python/setup.py) to install certain files to the Output directory specified in `config.ini` and download copies of the AO3 website's CSS files.
    - The contents of the `python` directory are 'portable', meaning they can go in any directory you like so long as they're all in the same directory.
 4. (Optional, highly recommended) Start a simple web server with access to the 'Output' directory specified in `config.ini` (by default `~/Documents/AO3-DL/Output`). I recommend using [Docker Compose](https://docs.docker.com/engine/install/) with the provided [docker-compose.yaml](docker/docker-compose.yaml), but anything should work as long as it supports PHP.
