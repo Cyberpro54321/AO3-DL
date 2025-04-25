@@ -66,9 +66,9 @@ AO3-DL is currently developed and tested only on Linux. It may be able to work o
 This project is developed and tested using:
 - Python version 3.11.2
 - [ao3_api](https://github.com/wendytg/ao3_api) version 2.3.1
-- `BeautifulSoup4` version 4.13.3
-- `lxml` version 5.4.0
-- `requests` version 2.28.1
+   - `BeautifulSoup4` version 4.13.3
+   - `lxml` version 5.4.0
+   - `requests` version 2.28.1
 - (Optional) `git` version 2.48
 Earlier or later versions of these projects may work, but I haven't done any testing to see what is the earliest version of each that will work.
 
