@@ -56,6 +56,7 @@ copiedFiles = (
     ("works.css", "../docker/"),
     ("works.php", "../docker/"),
     ("works-inner.php", "../docker/"),
+    ("index.html", "../docker/"),
 )
 
 
