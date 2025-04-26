@@ -85,6 +85,7 @@ def main(
         ) as cssOut:
             cssOut.write(work.workskin)
 
+    database.tagsFromWork(work=work, filename=config["dbFileFull"], logger=logger)
     if rowDB:
         database.updateWork(
             id=work.id, filename=config["dbFileFull"], row=rowLive, logger=logger

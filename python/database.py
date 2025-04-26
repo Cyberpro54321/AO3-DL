@@ -67,6 +67,115 @@ def initDB(
         dateLastEdited INTEGER,
         dateLastUpdated INTEGER);"""
     )
+    tagsStr = """
+        CREATE TABLE IF NOT EXISTS tags(
+        ID INTEGER PRIMATY KEY,
+        rating INTEGER,
+        warnings INTEGER,
+        category INTEGER,
+        """
+    for tagType in (
+        "Fandom",
+        "Ship",
+        "Character",
+        "Freeform",
+    ):
+        for i in range(75):
+            tagsStr += f"tag{tagType}{i + 1} VARCHAR(100),"
+    if tagsStr[-1:] == ",":
+        tagsStr = tagsStr[:-1]
+    tagsStr += ");"
+    cur.execute(tagsStr)
+    con.commit()
+    con.close()
+
+
+def tagsFromWork(
+    work: AO3.Work,
+    filename: str,
+    logger: logging.Logger,
+) -> None:
+    con, cur = openDB(filename=filename, logger=logger)
+    insertString = "INSERT OR REPLACE INTO tags VALUES (?, ?, ?, ?,"
+    for tagType in (
+        "Fandom",
+        "Ship",
+        "Character",
+        "Freeform",
+    ):
+        for i in range(75):
+            insertString += " ?,"
+    if insertString[-1:] == ",":
+        insertString = insertString[:-1] + ")"
+
+    ratingInt = 0
+    for num, i in enumerate(
+        [
+            "Not Rated",
+            "General Audiences",
+            "Teen And Up Audiences",
+            "Mature",
+            "Explicit",
+        ]
+    ):
+        if work.rating == i:
+            ratingInt = num + 1
+
+    warningInt = 0
+    for num, i in enumerate(
+        [
+            "No Archive Warnings Apply",
+            "Graphic Depictions Of Violence",
+            "Major Character Death",
+            "Rape/Non-Con",
+            "Underage",
+            "Creator Chose Not To Use Archive Warnings",
+        ]
+    ):
+        if work.warnings.count(i):
+            warningInt += pow(2, num)
+
+    categoryInt = 0
+    for num, i in enumerate(
+        [
+            "F/F",
+            "F/M",
+            "Gen",
+            "M/M",
+            "Multi",
+            "Other",
+        ]
+    ):
+        if work.categories.count(i):
+            categoryInt += pow(2, num)
+
+    insertTuple = tuple(
+        (
+            work.id,
+            ratingInt,
+            warningInt,
+            categoryInt,
+        )
+    )
+
+    bufferFan = work.fandoms.copy()
+    bufferChar = work.characters.copy()
+    bufferShip = work.relationships.copy()
+    bufferMisc = work.tags.copy()
+    for i in (
+        bufferFan,
+        bufferChar,
+        bufferShip,
+        bufferMisc,
+    ):
+        while len(i) > 75:
+            i.pop(75)
+        while len(i) < 75:
+            i.append("")
+        insertTuple += tuple(i)
+    logger.info(insertString)
+    logger.info(insertTuple)
+    cur.execute(insertString, insertTuple)
     con.commit()
     con.close()
 
