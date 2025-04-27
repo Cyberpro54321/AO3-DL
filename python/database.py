@@ -159,8 +159,8 @@ def tagsFromWork(
     )
 
     bufferFan = work.fandoms.copy()
-    bufferChar = work.characters.copy()
     bufferShip = work.relationships.copy()
+    bufferChar = work.characters.copy()
     bufferMisc = work.tags.copy()
     for i in (
         bufferFan,
@@ -173,8 +173,6 @@ def tagsFromWork(
         while len(i) < 75:
             i.append("")
         insertTuple += tuple(i)
-    logger.info(insertString)
-    logger.info(insertTuple)
     cur.execute(insertString, insertTuple)
     con.commit()
     con.close()
