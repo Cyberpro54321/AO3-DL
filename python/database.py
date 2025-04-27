@@ -164,8 +164,8 @@ def tagsFromWork(
     bufferMisc = work.tags.copy()
     for i in (
         bufferFan,
-        bufferChar,
         bufferShip,
+        bufferChar,
         bufferMisc,
     ):
         while len(i) > 75:
