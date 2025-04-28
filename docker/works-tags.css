@@ -1,0 +1,147 @@
+ul.workList {
+  list-style: none;
+  padding: 0;
+  margin: 1em;
+}
+ul.workList > li {
+  border: 1px solid lightgray;
+  margin-bottom: 1em;
+} 
+
+
+
+div.header {
+  position: relative;
+  min-height: 3em;
+  padding: 0.5em 0em;
+  display: flex;
+  justify-content: space-between;
+}
+div.header div:last-child {
+  overflow: hidden;
+  min-width: 25%;
+  text-align: right;
+}
+
+
+
+table.requiredTags {
+  color: white;
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+  text-align: center;
+  font-family: monospace;
+}
+table.requiredTags td {
+  border: 1px solid black;
+  width: 1em;
+  height: 1em;
+}
+
+.ratingN {
+  background-color: white;
+}
+.ratingG {
+  background-color: #78A700FF;
+}
+.ratingT {
+  background-color: yellow;
+}
+.ratingM {
+  background-color: orange;
+}
+.ratingE {
+  background-color: red;
+}
+
+.catN {
+  background-color: white;
+}
+.catFF {
+  background-color: red;
+}
+.catFM {
+  background-color: purple;
+}
+.catG {
+  background-color: green;
+}
+.catMM {
+  background-color: blue;
+}
+.catO {
+  background-color: black;
+}
+.catMu {
+  background-color: black;
+}
+
+.warning1 {
+  background-color: white;
+}
+.warningX {
+  background-color: red;
+}
+.warning6 {
+  background-color: orange;
+}
+
+.tagComplete {
+  background-color: green;
+}
+.tagIncomplete {
+  background-color: red;
+}
+
+
+
+ul li div h4,
+ul li div h5 {
+  font-weight: normal;
+  font-size: 100%;
+  padding: 0;
+  margin: 0 0 0 3.5em;
+}
+
+
+
+div.header .timestamp {
+  margin: 0 0.5em 0 0;
+}
+
+ul.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.tags.mainTags {
+  margin-left: 1em;
+  line-height: 1.275;
+}
+ul.tags li {
+  display: inline;
+}
+ul.tags li a {
+  border-bottom: 1px dotted;
+}
+ul.tags li::after {
+  content: ", ";
+}
+ul.tags li:last-child:after,
+ul.tags li:only-child:after {
+  content: none;
+}
+ul.tags li.tagWarn {
+  font-weight: bold;
+}
+ul.tags li.tagShips a {
+  background-color: lightgray;
+}
+
+
+
+div.stats {
+  text-align: right;
+  margin: 0.5em;
+}

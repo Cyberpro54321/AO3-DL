@@ -57,6 +57,9 @@ copiedFiles = (
     ("works.php", "../docker/"),
     ("works-inner.php", "../docker/"),
     ("index.html", "../docker/"),
+    ("works-tags.css", "../docker/"),
+    ("works-tags.php", "../docker/"),
+    ("works-tags-inner.php", "../docker/"),
 )
 
 
