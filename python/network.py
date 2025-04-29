@@ -258,7 +258,7 @@ def downloadWork(
             pauseLength = random.randrange(35, 85)
             logger.warning(
                 constants.loopErrorTemplate.format(
-                    f"downloading work {work.title}",
+                    f"downloading raw HTML file for work {work.title}",
                     pauseLength,
                     type(ex).__name__,
                     ex.args,
