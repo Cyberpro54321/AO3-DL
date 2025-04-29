@@ -96,7 +96,7 @@ def tagsFromWork(
     logger: logging.Logger,
 ) -> None:
     con, cur = openDB(filename=filename, logger=logger)
-    insertString = "INSERT OR REPLACE INTO tags VALUES (?, ?, ?, ?,"
+    insertString = "INSERT OR REPLACE INTO tags VALUES (?, ?, ?, ?"
     for tagType in (
         "Fandom",
         "Ship",
@@ -104,50 +104,42 @@ def tagsFromWork(
         "Freeform",
     ):
         for i in range(75):
-            insertString += " ?,"
-    if insertString[-1:] == ",":
-        insertString = insertString[:-1] + ")"
+            insertString += ", ?"
+    insertString += ")"
 
     ratingInt = 0
-    for num, i in enumerate(
-        [
-            "Not Rated",
-            "General Audiences",
-            "Teen And Up Audiences",
-            "Mature",
-            "Explicit",
-        ]
-    ):
-        if work.rating == i:
-            ratingInt = num + 1
+    ratings = [
+        "Not Rated",
+        "General Audiences",
+        "Teen And Up Audiences",
+        "Mature",
+        "Explicit",
+    ]
+    ratingInt = ratings.index(work.rating) + 1
 
     warningInt = 0
-    for num, i in enumerate(
-        [
-            "No Archive Warnings Apply",
-            "Graphic Depictions Of Violence",
-            "Major Character Death",
-            "Rape/Non-Con",
-            "Underage",
-            "Creator Chose Not To Use Archive Warnings",
-        ]
-    ):
-        if work.warnings.count(i):
-            warningInt += pow(2, num)
+    warnings = [
+        "No Archive Warnings Apply",
+        "Graphic Depictions Of Violence",
+        "Major Character Death",
+        "Rape/Non-Con",
+        "Underage",
+        "Creator Chose Not To Use Archive Warnings",
+    ]
+    for i in work.warnings:
+        warningInt += pow(2, warnings.index(i))
 
     categoryInt = 0
-    for num, i in enumerate(
-        [
-            "F/F",
-            "F/M",
-            "Gen",
-            "M/M",
-            "Multi",
-            "Other",
-        ]
-    ):
-        if work.categories.count(i):
-            categoryInt += pow(2, num)
+    categoriesList = [
+        "F/F",
+        "F/M",
+        "Gen",
+        "M/M",
+        "Multi",
+        "Other",
+    ]
+    for i in work.categories:
+        categoryInt += pow(2, categoriesList.index(i))
 
     insertTuple = tuple(
         (
