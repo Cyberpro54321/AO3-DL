@@ -144,7 +144,7 @@ def tagsFromWork(
 
     authorStr = ""
     for author in work.authors:
-        if not authorStr:
+        if authorStr:
             authorStr += ", "
         authorStr += author.username
 
