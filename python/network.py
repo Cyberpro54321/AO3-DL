@@ -133,7 +133,12 @@ def getSessionObj(
                 f"(Attempt {loopNo}): Getting AO3.session object",
             )
             session = AO3.Session(username=username, password=password)
-        except (TypeError, AO3.utils.LoginError, AO3.utils.HTTPError) as ex:
+        except (
+            TypeError,
+            AO3.utils.LoginError,
+            AO3.utils.HTTPError,
+            requests.exceptions.ConnectionError,
+        ) as ex:
             random.seed()
             if type(ex).__name__ == "HTTPError":
                 pauseLengthRange = (35, 85)
