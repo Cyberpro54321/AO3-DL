@@ -74,6 +74,7 @@ def initDB(
         warnings INTEGER,
         category INTEGER,
         authorStr VARCHAR(420),
+        summary VARCHAR(1250),
         """
     for tagType in (
         "Fandom",
@@ -97,7 +98,7 @@ def tagsFromWork(
     logger: logging.Logger,
 ) -> None:
     con, cur = openDB(filename=filename, logger=logger)
-    insertString = "INSERT OR REPLACE INTO tags VALUES (?, ?, ?, ?, ?"
+    insertString = "INSERT OR REPLACE INTO tags VALUES (?, ?, ?, ?, ?, ?"
     for tagType in (
         "Fandom",
         "Ship",
@@ -148,6 +149,10 @@ def tagsFromWork(
             authorStr += ", "
         authorStr += author.username
 
+    summaryStr = work.summary.strip()
+    if not summaryStr:
+        summaryStr += " "
+
     insertTuple = tuple(
         (
             work.id,
@@ -155,6 +160,7 @@ def tagsFromWork(
             warningInt,
             categoryInt,
             authorStr[:419],
+            summaryStr,
         )
     )
 
