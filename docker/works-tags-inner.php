@@ -114,6 +114,10 @@ while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
       } elseif ($rtw == 1) {
         $reqTagWrn = "<td class='warning1'> </td>";
       }
+    } elseif ($key == "authorStr") {
+      $authorStr = $value;
+    } elseif ($key == "summary") {
+      $summaryStr = $value;
     } elseif (substr($key, 0, 5) == "tagFa") {
       if (strlen($value) != 0) {
         $tagsFan .= "<li class='tagFan'><a>$value</a></li>";
@@ -136,7 +140,7 @@ while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
   echo '<div class="header">';
   echo '<table class="requiredTags"><tr>'.$reqTagRat.$reqTagCat.'</tr><tr>'.$reqTagWrn.$reqTagCmp.'</tr></table>';
   echo '<div>';
-  echo '<h4>'.$link." (".$id.')</h4>'; # TODO: List authors on this page
+  echo "<h4>$link ($id) by $authorStr</h4>";
   echo "<h5><ul class='tags fandoms'>$tagsFan</ul></h5>";
   echo '</div>';
   echo '<div>';
@@ -146,6 +150,7 @@ while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
   echo '</div>';
   echo '</div>';
   echo "<ul class='tags mainTags'>$tagsMain</ul>";
+  echo "<blockquote>$summaryStr</blockquote>";
   echo "<div class='stats'>Chapters: $chaptNumStr</div>";
   echo '</li>';
   // print_r($r2);
