@@ -7,6 +7,18 @@ function getOption($input, $option){
     return 0;
   }
 }
+function rowToHtmlSimple($row) {
+  global $dirHTML;
+  $id = str_pad($row['ID'], 8, '0', STR_PAD_LEFT);
+  $titleLink = "<td><a href=../$dirHTML/$id.html>".$row['title']."</a></td>";
+  $chp1 = $row['chaptersCount'];
+  $chp2 = $row['chaptersExpected'];
+  if ($chp2 == 0) {
+    $chp2 = "?";
+  }
+  $dateDL = date("Y/m/d", $row['dateLastDownloaded']);
+  return "<tr><td>$id</td>$titleLink<td>$chp1/$chp2</td><td>$dateDL</td></tr>";
+}
 
 # 0 = simple
 # 1 = tags
