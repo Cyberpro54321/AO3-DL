@@ -65,8 +65,8 @@ def downloadFile(
         url[int((-252 + len(extension)) * 0.75):].encode()
     ).decode()
     fileName = f"{fileNameCore}.{extension}"
-    if os.path.exists(fileName) and os.path.getsize(fileName):
-        return fileName
+    if os.path.exists(f"{dir}/{fileName}") and os.path.getsize(f"{dir}/{fileName}"):
+        return str(fileName)
     logger.info(f"Downloading file {url}")
     loopNo = 1
     while loopNo <= retries:
