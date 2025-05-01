@@ -8,6 +8,51 @@ function getOption($input, $option){
   }
 }
 
+# 0 = simple
+# 1 = tags
+$mode = 1;
+
+# 0 = all works
+# 1 = all works in certain series
+$target = 0;
+
+# by default, unused
+# if $target = 1, this represents the series ID to view the works of
+$subject = -1;
+
+if (array_key_exists("mode", $_GET)) {
+  switch (strtolower($_GET['mode'])) {
+    case "simple":
+    case "0":
+    case 0:
+      $mode = 0;
+      break;
+    case "tags":
+    case "1":
+    case 1:
+      $mode = 1;
+      break;
+  }
+}
+if (array_key_exists("target", $_GET)) {
+  switch (strtolower($_GET['target'])) {
+    case 'all':
+    case "0":
+    case 0:
+      $target = 0;
+      break;
+    case 'series':
+    case "1":
+    case 1:
+      $target = 1;
+      break;
+  }
+}
+if (array_key_exists("subject", $_GET)) {
+  $subject = $_GET['subject'];
+}
+// echo "<li>$mode, $target, $subject</li>";
+
 $config = parse_ini_file('config.ini', true);
 //print_r($config);
 $dirHTML = $config['output']['html'];
