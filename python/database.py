@@ -125,7 +125,7 @@ def tagsFromWork(
         "Graphic Depictions Of Violence",
         "Major Character Death",
         "Rape/Non-Con",
-        "Underage",
+        "Underage Sex",
         "Creator Chose Not To Use Archive Warnings",
     ]
     for i in work.warnings:
