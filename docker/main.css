@@ -10,14 +10,14 @@ ul.workList > li {
 
 
 
-div.header {
+ul.workList div.header {
   position: relative;
   min-height: 3em;
   padding: 0.5em 0em;
   display: flex;
   justify-content: space-between;
 }
-div.header div:last-child {
+ul.workList div.header div:last-child {
   overflow: hidden;
   min-width: 25%;
   text-align: right;
@@ -25,7 +25,7 @@ div.header div:last-child {
 
 
 
-table.requiredTags {
+ul.workList table.requiredTags {
   color: white;
   position: absolute;
   top: 0.5em;
@@ -33,71 +33,71 @@ table.requiredTags {
   text-align: center;
   font-family: monospace;
 }
-table.requiredTags td {
+ul.workList table.requiredTags td {
   border: 1px solid black;
   width: 1em;
   height: 1em;
 }
 
-.ratingN {
+ul.workList .ratingN {
   background-color: white;
 }
-.ratingG {
+ul.workList .ratingG {
   background-color: #78A700FF;
 }
-.ratingT {
+ul.workList .ratingT {
   background-color: yellow;
 }
-.ratingM {
+ul.workList .ratingM {
   background-color: orange;
 }
-.ratingE {
+ul.workList .ratingE {
   background-color: red;
 }
 
-.catN {
+ul.workList .catN {
   background-color: white;
 }
-.catFF {
+ul.workList .catFF {
   background-color: red;
 }
-.catFM {
+ul.workList .catFM {
   background-color: purple;
 }
-.catG {
+ul.workList .catG {
   background-color: green;
 }
-.catMM {
+ul.workList .catMM {
   background-color: blue;
 }
-.catO {
+ul.workList .catO {
   background-color: black;
 }
-.catMu {
+ul.workList .catMu {
   background-color: black;
 }
 
-.warning1 {
+ul.workList .warning1 {
   background-color: white;
 }
-.warningX {
+ul.workList .warningX {
   background-color: red;
 }
-.warning6 {
+ul.workList .warning6 {
   background-color: orange;
 }
 
-.tagComplete {
+ul.workList .tagComplete {
   background-color: green;
 }
-.tagIncomplete {
+ul.workList .tagIncomplete {
   background-color: red;
 }
 
 
 
-ul li div h4,
-ul li div h5 {
+ul.workList li div h4,
+ul.workList li div h5 {
   font-weight: normal;
   font-size: 100%;
   padding: 0;
@@ -106,42 +106,70 @@ ul li div h5 {
 
 
 
-div.header .timestamp {
+ul.workList div.header .timestamp {
   margin: 0 0.5em 0 0;
 }
 
-ul.tags {
+ul.workList ul.tags {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-ul.tags.mainTags {
+ul.workList ul.tags.mainTags {
   margin-left: 1em;
   line-height: 1.275;
 }
-ul.tags li {
+ul.workList ul.tags li {
   display: inline;
 }
-ul.tags li a {
+ul.workList ul.tags li a {
   border-bottom: 1px dotted;
 }
-ul.tags li::after {
+ul.workList ul.tags li::after {
   content: ", ";
 }
-ul.tags li:last-child:after,
-ul.tags li:only-child:after {
+ul.workList ul.tags li:last-child:after,
+ul.workList ul.tags li:only-child:after {
   content: none;
 }
-ul.tags li.tagWarn {
+ul.workList ul.tags li.tagWarn {
   font-weight: bold;
 }
-ul.tags li.tagShips a {
+ul.workList ul.tags li.tagShips a {
   background-color: lightgray;
 }
 
 
 
-div.stats {
+ul.workList div.stats {
   text-align: right;
   margin: 0.5em;
+}
+
+
+
+/*
+SIMPLE LIST
+*/
+
+table.workList table {
+  width: 100%;
+}
+
+table.workList .tableColId,
+table.workList .tableColChapters,
+table.workList .tableColDateDL
+{
+  width: 10%;
+}
+
+table.workList .tableColTitle {
+  width: 65%;
+}
+
+table.workList td {
+  text-align: center;
+}
+table.workList tr > :nth-child(2) {
+  text-align: left;
 }
