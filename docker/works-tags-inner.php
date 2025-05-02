@@ -7,13 +7,6 @@ define("TAG_CATEGORIES", array(
   array("Freeform", "tagFreeform")
 ));
 
-function getOption($input, $option){
-  if (($input & pow(2, $option)) == pow(2, $option)) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 function intToArray($input) {
   $array = [];
   for ($i=7; $i >= 0; $i--) { 
@@ -240,6 +233,33 @@ $dbConnect = new SQLite3($dbFileRelative, SQLITE3_OPEN_CREATE | SQLITE3_OPEN_REA
 
 $query = $dbConnect->query("SELECT * FROM works");
 
+echo "
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Browse All Downloaded Works - AO3-DL</title>
+    <meta charset='UTF-8'>
+    <link rel='stylesheet' href='main.css'>
+    <link rel='stylesheet' href='custom.css'>
+    <link rel='icon' href='favicon.png'>
+  </head>
+  <body>
+";
+switch ($mode) {
+  case 0:
+    echo "<table class='workList'>
+        <tr>
+          <th class='tableColId'>ID</th>
+          <th class='tableColTitle'>Title</th>
+          <th class='tableColChapters'>Chapters</th>
+          <th class='tableColDateDL'>Date Downloaded</th>
+        </tr>
+    ";
+    break;
+  case 1:
+    echo "<ul class='workList'>";
+    break;
+}
 while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
   switch ($mode) {
     case 0:
@@ -250,5 +270,18 @@ while ($row = $query->fetchArray(SQLITE3_ASSOC)) {
       break;
   }
 }
+switch ($mode) {
+  case 0:
+    echo "</table>";
+    break;
+  case 1:
+    echo "</ul>";
+    break;
+}
+
+echo "
+</body>
+</html>
+";
 
 ?>
