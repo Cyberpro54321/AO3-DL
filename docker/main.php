@@ -231,13 +231,30 @@ $dbFileRelative = $config['output']['database'];
 
 $dbConnect = new SQLite3($dbFileRelative, SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
 
-$query = $dbConnect->query("SELECT * FROM works");
+switch ($target) {
+  // case 1:
+  
+  case 0:
+  default:
+    $query = $dbConnect->query("SELECT * FROM works");
+    $pageTitleCore = "Browse All Downloaded Works"; 
+    break;
+}
+
+switch ($mode) {
+  case 0:
+    $pageTitleCore .= " - Simple Mode";
+    break;
+  case 1:
+    $pageTitleCore .= " - Tags Mode";
+    break;
+}
 
 echo "
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Browse All Downloaded Works - AO3-DL</title>
+    <title>$pageTitleCore - AO3-DL</title>
     <meta charset='UTF-8'>
     <link rel='stylesheet' href='main.css'>
     <link rel='stylesheet' href='custom.css'>
