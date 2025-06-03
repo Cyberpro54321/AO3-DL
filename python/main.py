@@ -129,9 +129,12 @@ if __name__ == "__main__":
     if not os.path.exists(config["dbFileFull"]):
         database.initDB(filename=config["dbFileFull"], logger=logger)
     setErrImg = main(work=work, config=config, logger=logger)
-    with open(f"{config['dirLogs']}/err-main-imgIncomplete.log", "w") as fileErrImg:
-        for i in setErrImg:
-            fileErrImg.write(f"{i}\n")
+    errLogger = getLogger.getLogger(
+        level=config["logsLevel"],
+        mode="stderr",
+    )
+    for i in setErrImg:
+        errLogger.error("Image {" + i + "} couldn't be downloaded")
     if config["useGit"]:
         acp(dirRaws=config["dirRaws"], logger=logger)
     logger.info("Complete, main.py stopping")

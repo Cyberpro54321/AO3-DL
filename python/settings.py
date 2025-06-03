@@ -37,38 +37,8 @@ def setup():
         metavar="",
     )
     parser.add_argument(
-        "--logs",
+        "--log-level",
         "-l",
-        type=str,
-        help="Override what directory the log file will be written to.",
-        metavar="",
-    )
-    parser.add_argument(
-        "--logs-timestamp",
-        type=str,
-        help="Override whether to use timestamps in log filenames or not.",
-        metavar="",
-        choices=[
-            "False",
-            "True",
-            "No",
-            "Yes",
-            "false",
-            "true",
-            "no",
-            "yes",
-            "F",
-            "T",
-            "N",
-            "Y",
-            "f",
-            "t",
-            "n",
-            "y",
-        ],
-    )
-    parser.add_argument(
-        "--logs-level",
         type=str,
         help="Override what types of messages get written to log file.",
         metavar="",
@@ -128,11 +98,6 @@ def parse():
         f'{settings["dirOutput"]}/{config["output"]["database"]}'
     )
 
-    if args.logs:
-        settings["dirLogs"] = toAbsPath(args.logs)
-    else:
-        settings["dirLogs"] = toAbsPath(config["logs"]["dir"])
-
     if args.logs_timestamp is None:
         settings["logsTimestamp"] = config["logs"].getboolean("timestamp")
     else:
@@ -171,9 +136,9 @@ def parse():
         f"{settings['dirOutput']}/{settings['dirOutImg']}",
         f"{settings['dirOutput']}/{settings['dirWorkskins']}",
         f"{settings['dirOutput']}/{settings['dirAO3CSS']}",
-        settings["dirLogs"],
         os.path.dirname(settings["ao3UsernameFile"]),
         os.path.dirname(settings["ao3PasswordFile"]),
+        os.path.dirname(settings["ao3SessionPickle"]),
     ):
         os.makedirs(i, exist_ok=True)
 
@@ -186,6 +151,6 @@ def parse():
         settings["ao3DoLogin"] = False
         print("ERROR: Username & Password files don't exist.")
 
-    for i in ("dirRaws", "dirLogs"):
+    for i in ("dirRaws",):
         if not os.path.exists(settings[i]):
             raise Exception(f"Specified directory doesn't exist: {settings[i]}")

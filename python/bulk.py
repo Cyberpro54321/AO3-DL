@@ -87,15 +87,14 @@ with concurrent.futures.ThreadPoolExecutor(
 if config["useGit"]:
     main.acp(dirRaws=config["dirRaws"], logger=logger)
 
-with open(f'{config["dirLogs"]}/err-bulk-workIncomplete.txt', "w") as errorFile:
-    for i in ids.difference(completed):
-        logger.error(f"Work {i} failed to complete")
-        errorFile.write(f"{i}\n")
-
-
-with open(f"{config['dirLogs']}/err-bulk-imgIncomplete.log", "w") as fileErrImg:
-    for i in incompleteImg:
-        fileErrImg.write(f"{i}\n")
+errLogger = getLogger.getLogger(
+    level=config["logsLevel"],
+    mode="stderr",
+)
+for i in ids.difference(completed):
+    errLogger.error("Work {" + i + "} failed to complete")
+for i in incompleteImg:
+    errLogger.error("Image {" + i + "} couldn't be downloaded")
 
 
 logger.info("Mostly complete, checking for exceptions from threads")

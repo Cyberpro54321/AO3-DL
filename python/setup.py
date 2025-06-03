@@ -44,7 +44,6 @@ for i in (
     f"{config['dirOutput']}/{config['dirOutImg']}",
     f"{config['dirOutput']}/{config['dirWorkskins']}",
     f"{config['dirOutput']}/{config['dirAO3CSS']}",
-    config["dirLogs"],
     os.path.dirname(config["ao3UsernameFile"]),
     os.path.dirname(config["ao3PasswordFile"]),
 ):
