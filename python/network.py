@@ -165,9 +165,10 @@ def getSessionObj(
 def login(
     config: dict,
     logger: logging.Logger,
+    allowPickle=True,
 ) -> AO3.Session:
     if config["ao3DoLogin"]:
-        if os.path.exists(config.get("ao3SessionPickle")):
+        if allowPickle and os.path.exists(config.get("ao3SessionPickle")):
             logger.info("Attempting to retreive session from pickle...")
             with open(config["ao3SessionPickle"], "rb") as file:
                 session = pickle.load(file)
@@ -181,14 +182,14 @@ def login(
             )
             del ao3Username
             del ao3Password
-            with open(config.get("ao3SessionPickle"), "wb") as file:
-                pickle.dump(session, file)
-            try:
-                pass
-            except:
-                logger.error(
-                    f"Could not write session pickle to {config.get('ao3SessionPickle')}"
-                )
+            if allowPickle:
+                try:
+                    with open(config.get("ao3SessionPickle"), "wb") as file:
+                        pickle.dump(session, file)
+                except FileNotFoundError:
+                    logger.error(
+                        f"Could not write session pickle to {config.get('ao3SessionPickle')}"
+                    )
     else:
         session = None
     return session
