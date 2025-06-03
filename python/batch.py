@@ -17,7 +17,7 @@ def parseBatchFile(
     lines = set(())
     with open(file) as inputFile:
         for line in inputFile:
-            lines.add(line)
+            lines.add(line.strip())
     for line in lines:
         for id in parseBatchLine(line=line, logger=logger, ao3Session=ao3Session):
             ids.add(id)
