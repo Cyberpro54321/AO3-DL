@@ -98,14 +98,6 @@ def parse():
         f'{settings["dirOutput"]}/{config["output"]["database"]}'
     )
 
-    if args.logs_timestamp is None:
-        settings["logsTimestamp"] = config["logs"].getboolean("timestamp")
-    else:
-        if str(args.logs_timestamp).lower()[:1] in ("y", "t"):
-            settings["logsTimestamp"] = True
-        else:
-            settings["logsTimestamp"] = False
-
     settings["ao3DoLogin"] = config["ao3"].getboolean("login")
 
     settings["ao3UsernameFile"] = toAbsPath(config["ao3"]["usernameFile"])
@@ -113,8 +105,8 @@ def parse():
     settings["ao3PasswordFile"] = toAbsPath(config["ao3"]["passwordFile"])
     settings["ao3SessionPickle"] = toAbsPath(config["ao3"]["pickle"])
 
-    if args.logs_level:
-        logLevelInput = args.logs_level
+    if args.log_level:
+        logLevelInput = args.log_level
     else:
         logLevelInput = config["logs"]["level"]
     if isinstance(logLevelInput, str):
