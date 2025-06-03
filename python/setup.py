@@ -54,6 +54,7 @@ copiedFiles = (
     ("config.ini", "./"),
     ("main.css", "../docker/"),
     ("main.php", "../docker/"),
+    ("work.php", "../docker/"),
     ("index.html", "../docker/"),
 )
 
