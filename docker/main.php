@@ -24,7 +24,7 @@ function intToArray($input) {
 function rowToHtmlSimple($row) {
   global $dirHTML;
   $id = str_pad($row['ID'], 8, '0', STR_PAD_LEFT);
-  $titleLink = "<td><a href=../$dirHTML/$id.html>".$row['title']."</a></td>";
+  $titleLink = "<td><a href=$dirHTML/$id.html>".$row['title']."</a></td>";
   $chp1 = $row['chaptersCount'];
   $chp2 = $row['chaptersExpected'];
   if ($chp2 == 0) {
@@ -36,7 +36,7 @@ function rowToHtmlSimple($row) {
 function rowToHtmlTags($row) {
   global $dirHTML, $dbConnect;
   $id = str_pad($row['ID'], 8, '0', STR_PAD_LEFT);
-  $titleLink = "<a href=../$dirHTML/$id.html>".$row['title']."</a>";
+  $titleLink = "<a href=$dirHTML/$id.html>".$row['title']."</a>";
   $chp1 = $row['chaptersCount'];
   $chp2 = $row['chaptersExpected'];
   if ($chp2 == 0) {
