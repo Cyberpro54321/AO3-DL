@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import datetime
 import logging
 import os.path
 import subprocess
@@ -107,17 +106,7 @@ if __name__ == "__main__":
     settings.parse()
     config = settings.settings
 
-    logCore = "main"
-    if config["logsTimestamp"]:
-        logAppend = (
-            datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
-        )
-    else:
-        logAppend = "latest"
     logger = getLogger.getLogger(
-        core=logCore,
-        append=logAppend,
-        dirLogs=config["dirLogs"],
         level=config["logsLevel"],
     )
 

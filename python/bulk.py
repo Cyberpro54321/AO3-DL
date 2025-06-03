@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import concurrent.futures
-import datetime
 import os.path
 
 import AO3
@@ -52,15 +51,7 @@ settings.parse()
 config = settings.settings
 
 
-logCore = "bulk"
-if config["logsTimestamp"]:
-    logAppend = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
-else:
-    logAppend = "latest"
 logger = getLogger.getLogger(
-    core=logCore,
-    append=logAppend,
-    dirLogs=config["dirLogs"],
     level=config["logsLevel"],
     includeThreadName=True,
 )
@@ -98,9 +89,7 @@ if config["useGit"]:
 
 with open(f'{config["dirLogs"]}/err-bulk-workIncomplete.txt', "w") as errorFile:
     for i in ids.difference(completed):
-        errorMsg = f"Work {i} failed to complete"
-        print(errorMsg)
-        logger.error(errorMsg)
+        logger.error(f"Work {i} failed to complete")
         errorFile.write(f"{i}\n")
 
 
@@ -115,9 +104,6 @@ for i in futures:
     try:
         futures[i].result()
     except AO3.utils.InvalidIdError:
-        errStr = f"WorkID {i} not found (Error 404)"
-        print(errStr)
-        logger.error(errStr)
-        del errStr
+        logger.error(f"WorkID {i} not found (Error 404)")
 
 logger.info("Complete, bulk.py exiting")

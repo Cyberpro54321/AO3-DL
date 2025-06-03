@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import csv
-import datetime
 import os.path
 import logging
 
@@ -153,15 +152,7 @@ group.add_argument(
 settings.parse()
 config = settings.settings
 
-logCore = "io"
-if config["logsTimestamp"]:
-    logAppend = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
-else:
-    logAppend = "latest"
 logger = getLogger.getLogger(
-    core=logCore,
-    append=logAppend,
-    dirLogs=config["dirLogs"],
     level=config["logsLevel"],
 )
 
