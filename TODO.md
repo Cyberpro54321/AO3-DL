@@ -17,8 +17,8 @@
 - [X] Detect broken image links hosted on Discord
 - [X] Detect deleted / privated works
 - [ ] Filesize check
-- [ ] Pickle Login
-- [ ] Stdout logs
+- [X] Pickle Login
+- [X] Stdout logs
 
 ## Bug Testing
 - [ ] Check works with no summaries

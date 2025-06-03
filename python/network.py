@@ -3,6 +3,7 @@
 import base64
 import logging
 import os.path
+import pickle
 import random
 import time
 import urllib.parse
@@ -166,15 +167,28 @@ def login(
     logger: logging.Logger,
 ) -> AO3.Session:
     if config["ao3DoLogin"]:
-        with open(config["ao3UsernameFile"]) as file:
-            ao3Username = file.readline().strip()
-        with open(config["ao3PasswordFile"]) as file:
-            ao3Password = file.readline().strip()
-        session = getSessionObj(
-            username=ao3Username, password=ao3Password, logger=logger
-        )
-        del ao3Username
-        del ao3Password
+        if os.path.exists(config.get("ao3SessionPickle")):
+            logger.info("Attempting to retreive session from pickle...")
+            with open(config["ao3SessionPickle"], "rb") as file:
+                session = pickle.load(file)
+        else:
+            with open(config["ao3UsernameFile"]) as file:
+                ao3Username = file.readline().strip()
+            with open(config["ao3PasswordFile"]) as file:
+                ao3Password = file.readline().strip()
+            session = getSessionObj(
+                username=ao3Username, password=ao3Password, logger=logger
+            )
+            del ao3Username
+            del ao3Password
+            with open(config.get("ao3SessionPickle"), "wb") as file:
+                pickle.dump(session, file)
+            try:
+                pass
+            except:
+                logger.error(
+                    f"Could not write session pickle to {config.get('ao3SessionPickle')}"
+                )
     else:
         session = None
     return session

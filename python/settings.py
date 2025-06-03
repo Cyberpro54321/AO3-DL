@@ -146,6 +146,7 @@ def parse():
     settings["ao3UsernameFile"] = toAbsPath(config["ao3"]["usernameFile"])
 
     settings["ao3PasswordFile"] = toAbsPath(config["ao3"]["passwordFile"])
+    settings["ao3SessionPickle"] = toAbsPath(config["ao3"]["pickle"])
 
     if args.logs_level:
         logLevelInput = args.logs_level
