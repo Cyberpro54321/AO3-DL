@@ -4,7 +4,7 @@ ul.workList {
   margin: 1em;
 }
 ul.workList > li {
-  border: 1px solid lightgray;
+  border: 0.1em solid lightgray;
   margin-bottom: 1em;
 } 
 
@@ -137,6 +137,12 @@ ul.workList ul.tags li.tagWarn {
 }
 ul.workList ul.tags li.tagShips a {
   background-color: lightgray;
+}
+
+
+
+ul.workList li blockquote {
+  overflow-wrap: break-word;
 }
 
 

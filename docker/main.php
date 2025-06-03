@@ -256,6 +256,7 @@ echo "
   <head>
     <title>$pageTitleCore - AO3-DL</title>
     <meta charset='UTF-8'>
+    <link rel='stylesheet' href='normalize.css'>
     <link rel='stylesheet' href='main.css'>
     <link rel='stylesheet' href='custom.css'>
     <link rel='icon' href='favicon.png'>
