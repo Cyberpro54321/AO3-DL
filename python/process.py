@@ -10,13 +10,19 @@ import init
 
 
 def tagToFile(
-    tag: bs4.Tag,
+    tag,
     filename: str,
 ) -> None:
-    newSoup = bs4.BeautifulSoup()
-    newSoup.append(tag)
+    if isinstance(tag, str):
+        tagStr = tag
+    if isinstance(tag, list):
+        tagStr = ""
+        for i in tag:
+            tagStr += i.prettify(formatter="html5")
+    if isinstance(tag, bs4.Tag):
+        tagStr = tag.prettify(formatter="html5")
     with open(filename, "w") as file:
-        file.write(newSoup.prettify(formatter="html5"))
+        file.write(tagStr)
 
 
 def processSingle(
@@ -33,13 +39,48 @@ def processSingle(
     if (not os.path.isdir(wIdFolder)) or (not os.path.exists(wIdFolder)):
         raise Exception
 
-    tagsDiv = rawSoup.find(id="preface").div.dl
+    ################################################################
+    # Tag Isolation
+    ################################################################
+    ################################
+    # TagsDiv
+    ################################
+    headerMeta = rawSoup.find(id="preface").div
+    tagsDiv = headerMeta.dl
     tagsDiv["class"] = ["works meta group"]
     tagToFile(
         tag=tagsDiv,
         filename=os.path.join(wIdFolder, "tags.html"),
     )
     del tagsDiv
+    ################################
+    # Rest of Header
+    ################################
+    title = headerMeta.h1.string
+    headerBlockquotes = headerMeta.find_all("blockquote", class_="userstuff")
+    try:
+        tagToFile(
+            tag=headerBlockquotes[1],
+            filename=os.path.join(wIdFolder, "start-notes.html"),
+        )
+        tagToFile(
+            tag=headerBlockquotes[0],
+            filename=os.path.join(wIdFolder, "summary.html"),
+        )
+    except IndexError:
+        match headerMeta.p.string:
+            case "Summary":
+                hbqDest = "summary.html"
+            case "Notes":
+                hbqDest = "start-notes.html"
+        tagToFile(
+            tag=headerBlockquotes[0],
+            filename=os.path.join(wIdFolder, hbqDest),
+        )
+        del hbqDest
+    ################################
+    # WIP: Get Author String from raw
+    ################################
 
 
 def multithreading(
