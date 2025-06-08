@@ -4,26 +4,26 @@ function displayChapter($num) {
   global $id;
   echo "<div id='chapter-$num' class='chapter'>";
   echo "<div class='chapter preface group'>";
-  echo "<h3 class='title'>Chapter $num: ".file_get_contents("HTML/$id/$num/title.txt")."</h3>";
-  if (file_exists("HTML/$id/$num/summary.html")) {
+  echo "<h3 class='title'>Chapter $num: ".file_get_contents("$id/$num/title.txt")."</h3>";
+  if (file_exists("$id/$num/summary.html")) {
     echo "<div id='summary' class='summary module'>
     <h3 class='heading'>Summary:</h3>
     <blockquote class='userstuff'>";
-    echo file_get_contents("HTML/$id/$num/summary.html");
+    echo file_get_contents("$id/$num/summary.html");
     echo "</blockquote>";
     echo "</div>"; // summary
   }
-  if (file_exists("HTML/$id/$num/notes-start.html")) {
+  if (file_exists("$id/$num/notes-start.html")) {
     echo "<div id='notes' class='notes module'>
     <h3 class='heading'>Notes:</h3>
     <blockquote class='userstuff'>";
-    echo file_get_contents("HTML/$id/$num/notes-start.html");
+    echo file_get_contents("$id/$num/notes-start.html");
     echo "</blockquote>";
     echo "</div>"; // notes
   }
   echo "</div>"; // chapter preface group
   
-  echo "<div class='userstuff module' role='article'>".file_get_contents("HTML/$id/$num/main.html")."</div>";
+  echo "<div class='userstuff module' role='article'>".file_get_contents("$id/$num/main.html")."</div>";
 
   if (file_exists("HTML/$id/$num/notes-end.html")) {
     echo "
@@ -31,7 +31,7 @@ function displayChapter($num) {
     <div id='chapter_".$num."_endnotes' class='end notes module'>
     <h3 class='heading'>Notes:</h3>
     <blockquote class='userstuff'>
-    ".file_get_contents("HTML/$id/$num/notes-end.html")."
+    ".file_get_contents("$id/$num/notes-end.html")."
     </blockquote>
     </div>
     </div>
@@ -41,6 +41,7 @@ function displayChapter($num) {
   echo "</div>"; // chapter-num
 }
 
+$chapter = 0;
 if (array_key_exists("id", $_GET)) {
   $id = $_GET["id"];
 }
@@ -105,7 +106,7 @@ echo "<link href='ao3css/sandbox.css' rel='stylesheet'>
 <div id='inner' class='wrapper'>
 <div id='main' class='works-show region' role='main'>
 ";
-echo "<div class='wrapper'>".file_get_contents("HTML/$id/tags.html")."</div>";
+echo "<div class='wrapper'>".file_get_contents("$id/tags.html")."</div>";
 echo "<div id='workskin'>";
 echo "<div class='preface group'>
 <h2 class='title heading'>$title</h2>
@@ -116,13 +117,13 @@ if ($chapter == 0 or $chapter == 1) {
     echo "<div class='summary module'>
       <h3 class='heading'>Summary:</h3>
       <blockquote class='userstuff'>
-      ".file_get_contents("HTML/$id/summary.html")."</blockquote></div>";
+      ".file_get_contents("$id/summary.html")."</blockquote></div>";
   }
   if (file_exists("HTML/$id/notes.html")) {
     echo "<div class='notes module'>
       <h3 class='heading'>Notes:</h3>
       <blockquote class='userstuff'>
-      ".file_get_contents("HTML/$id/notes.html")."</blockquote></div>";
+      ".file_get_contents("$id/notes.html")."</blockquote></div>";
   }
 }
 echo "</div>"; // preface group
