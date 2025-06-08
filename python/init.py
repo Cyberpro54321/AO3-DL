@@ -1,5 +1,7 @@
 import argparse
+import configparser
 import logging
+import os.path
 from _io import TextIOWrapper
 import sys
 
@@ -45,3 +47,20 @@ parser.add_argument(
 args = parser.parse_args()
 logger = getLogger(stream=args.outfile)
 errLogger = getLogger(stream=args.errfile)
+
+ini = configparser.ConfigParser()
+ini.read(
+    [
+        "/etc/ao3-dl/config.ini",
+        os.path.expanduser("~/.config/ao3-dl/config.ini"),
+        "config.ini",
+    ]
+)
+config = {}
+config["dirRaws"] = os.path.expanduser(
+    ini.get("dir", "raws", fallback="~/Documents/AO3-DL/Raws/")
+)
+
+config["dirOut"] = os.path.expanduser(
+    ini.get("dir", "out", fallback="~/Documents/AO3-DL/Output/")
+)
