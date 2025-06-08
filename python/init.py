@@ -27,7 +27,8 @@ def getLogger(
         format=formatStr,
         datefmt="%H:%M:%S",
     )
-    logger.info("Logger Initialized")
+    if stream != sys.stderr:
+        logger.info("Logger Initialized")
     return logger
 
 
@@ -43,3 +44,4 @@ parser.add_argument(
 )
 args = parser.parse_args()
 logger = getLogger(stream=args.outfile)
+errLogger = getLogger(stream=args.errfile)
