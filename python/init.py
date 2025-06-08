@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-
+import argparse
 import logging
 from _io import TextIOWrapper
 import sys
@@ -7,7 +6,7 @@ import sys
 
 def getLogger(
     level: int = logging.INFO,
-    includeThreadName: bool = False,
+    includeThreadName: bool = True,
     mode: str = "stdout",
     stream: TextIOWrapper = None,
 ) -> logging.Logger:
@@ -23,9 +22,6 @@ def getLogger(
     else:
         formatStr = "[%(asctime)s] [%(levelname)-8s]: %(message)s"
     logging.basicConfig(
-        # filename=f"{dirLogs}/{core}-{append}.log",
-        # filemode="w",
-        # encoding="utf-8",
         stream=stream,
         level=level,
         format=formatStr,
@@ -33,3 +29,17 @@ def getLogger(
     )
     logger.info("Logger Initialized")
     return logger
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--infile", "-i", nargs="?", type=argparse.FileType("r"), default=sys.stdin
+)
+parser.add_argument(
+    "--outfile", "-o", nargs="?", type=argparse.FileType("w"), default=sys.stdout
+)
+parser.add_argument(
+    "--errfile", "-e", nargs="?", type=argparse.FileType("w"), default=sys.stderr
+)
+args = parser.parse_args()
+logger = getLogger(stream=args.outfile)
