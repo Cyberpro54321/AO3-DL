@@ -136,6 +136,16 @@ if ($chapter == 0) {
 } else {
   displayChapter($chapter);
 }
+echo "</div>";
+echo "<div class='afterword preface group'>";
+if (file_exists("$id/end-notes.html")) {
+  # code...
+echo "<div id='work_endnotes' class='end notes module'>
+  <h3 class='heading'>Notes:</h3>
+  <blockquote class='userstuff'>".file_get_contents("$id/end-notes.html")."</blockquote>
+  </div>";
+}
+echo "</div>";
 
 echo "
 </div>
