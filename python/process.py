@@ -15,13 +15,21 @@ import init
 def tagToFile(
     tag,
     filename: str,
+    logger: logging.Logger,
 ) -> None:
     if isinstance(tag, str):
         tagStr = tag
     if isinstance(tag, list):
         tagStr = ""
         for i in tag:
-            tagStr += i.prettify(formatter="html5")
+            try:
+                tagStr += i.prettify(formatter="html5")
+            except AttributeError:
+                logger.log(
+                    int(30 - (20 * int(isinstance(i, bs4.NavigableString)))),
+                    f"tagToFile() encountered [{type(i)}] which doesn't have a 'prettify' method",
+                )
+                tagStr += str(i)
     if isinstance(tag, bs4.Tag):
         tagStr = tag.prettify(formatter="html5")
     with open(filename, "w") as file:
@@ -93,6 +101,7 @@ def processSingle(
         sqlInfo["chaptersExpected"] = int(chapterNOs[1])
     except ValueError:
         sqlInfo["chaptersExpected"] = 0
+    del chapterNOs
     dateUpdatedKey = "Updated:"
     if sqlInfo["chaptersExpected"] == 1:
         dateUpdatedKey = "Published:"
@@ -129,6 +138,7 @@ def processSingle(
     tagToFile(
         tag=tagsDiv,
         filename=os.path.join(wIdFolder, "tags.html"),
+        logger=logger,
     )
     del tagsDiv
     ################################
@@ -140,10 +150,12 @@ def processSingle(
         tagToFile(
             tag=headerBlockquotes[1].contents,
             filename=os.path.join(wIdFolder, "start-notes.html"),
+            logger=logger,
         )
         tagToFile(
             tag=headerBlockquotes[0].contents,
             filename=os.path.join(wIdFolder, "summary.html"),
+            logger=logger,
         )
     except IndexError:
         match headerMeta.p.string:
@@ -154,6 +166,7 @@ def processSingle(
         tagToFile(
             tag=headerBlockquotes[0].contents,
             filename=os.path.join(wIdFolder, hbqDest),
+            logger=logger,
         )
         del hbqDest
     sqlInfo["authors"] = []
@@ -163,9 +176,67 @@ def processSingle(
         tagToFile(
             tag=rawSoup.find(id="afterword").find(id="endnotes").blockquote.contents,
             filename=os.path.join(wIdFolder, "end-notes.html"),
+            logger=logger,
         )
     except AttributeError:
         logger.debug(f"Work [{workID}] doesn't seem to have work end notes/")
+    allPrefaces = rawSoup.select("#chapters > div.meta.group")
+    allMains = rawSoup.select("#chapters > div.userstuff")
+    allPostfaces = {}
+    for i in range(1, 1 + len(allMains)):
+        try:
+            allPostfaces[i] = rawSoup.find(id=f"endnotes{i}")
+        except KeyError:
+            logger.debug(f"Work [{workID}] Chapter [{i}] doesn't seem to have endnotes")
+    for chaptNum in range(1, 1 + len(allPrefaces)):
+        chaptFolder = os.path.join(wIdFolder, str(chaptNum))
+        os.makedirs(chaptFolder, exist_ok=True)
+        ################################
+        # Real
+        ################################
+        tagToFile(
+            tag=allPrefaces[chaptNum - 1].h2.string,
+            filename=os.path.join(chaptFolder, "title.txt"),
+            logger=logger,
+        )
+        preBQs = allPrefaces[chaptNum - 1].find_all("blockquote")
+        if len(preBQs) == 2:
+            tagToFile(
+                tag=preBQs[0].contents,
+                filename=os.path.join(chaptFolder, "summary.html"),
+                logger=logger,
+            )
+            tagToFile(
+                tag=preBQs[1].contents,
+                filename=os.path.join(chaptFolder, "notes-start.html"),
+                logger=logger,
+            )
+        elif len(preBQs) == 1:
+            match allPrefaces[chaptNum - 1].p.string:
+                case "Chapter Notes":
+                    bqDest = "notes-start.html"
+                case "Chapter Summary":
+                    bqDest = "summary.html"
+            tagToFile(
+                tag=preBQs[0].contents,
+                filename=os.path.join(chaptFolder, bqDest),
+                logger=logger,
+            )
+            del bqDest
+        del preBQs
+        tagToFile(
+            tag=allMains[chaptNum - 1].contents,
+            filename=os.path.join(chaptFolder, "main.html"),
+            logger=logger,
+        )
+        tail = allPostfaces.get(chaptNum)
+        if tail:
+            tagToFile(
+                tag=tail.blockquote.contents,
+                filename=os.path.join(chaptFolder, "notes-end.html"),
+                logger=logger,
+            )
+
     db.addWork(
         id=workID,
         info=sqlInfo,
@@ -190,11 +261,16 @@ def multithreading(
         import concurrent.futures
 
         futures = {}
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix=constants.threadNameBulk
+        ) as pool:
             for workID in workIDs:
                 futures[workID] = pool.submit(
                     processSingle, workID=workID, config=config, logger=logger
                 )
+        for i in futures:
+            futures[i].result()
+    logger.info("Complete, process.multithreding exiting")
 
 
 if __name__ == "__main__":
