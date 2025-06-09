@@ -25,7 +25,7 @@ function displayChapter($num) {
   
   echo "<div class='userstuff module' role='article'>".file_get_contents("$id/$num/main.html")."</div>";
 
-  if (file_exists("HTML/$id/$num/notes-end.html")) {
+  if (file_exists("$id/$num/notes-end.html")) {
     echo "
     <div class='chapter preface group'>
     <div id='chapter_".$num."_endnotes' class='end notes module'>
@@ -113,13 +113,13 @@ echo "<div class='preface group'>
 <h3 class='byline heading'>$rowTags[authorStr]</h3>
 ";
 if ($chapter == 0 or $chapter == 1) {
-  if (file_exists("HTML/$id/summary.html")) {
+  if (file_exists("$id/summary.html")) {
     echo "<div class='summary module'>
       <h3 class='heading'>Summary:</h3>
       <blockquote class='userstuff'>
       ".file_get_contents("$id/summary.html")."</blockquote></div>";
   }
-  if (file_exists("HTML/$id/notes.html")) {
+  if (file_exists("$id/start-notes.html")) {
     echo "<div class='notes module'>
       <h3 class='heading'>Notes:</h3>
       <blockquote class='userstuff'>
