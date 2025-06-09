@@ -44,9 +44,8 @@ parser.add_argument(
 parser.add_argument(
     "--errfile", "-e", nargs="?", type=argparse.FileType("w"), default=sys.stderr
 )
+parser.add_argument("--log-level", "-l", default="")
 args = parser.parse_args()
-logger = getLogger(stream=args.outfile)
-errLogger = getLogger(stream=args.errfile)
 
 ini = configparser.ConfigParser()
 ini.read(
@@ -60,7 +59,27 @@ config = {}
 config["dirRaws"] = os.path.expanduser(
     ini.get("dir", "raws", fallback="~/Documents/AO3-DL/Raws/")
 )
-
 config["dirOut"] = os.path.expanduser(
     ini.get("dir", "out", fallback="~/Documents/AO3-DL/Output/")
 )
+config["sqlType"] = ini.get("db", "type", fallback="sqlite")
+config["sqlLocation"] = ini.get("db", "location", fallback="main.sqlite")
+logLevelRaw = ini.get("logs", "level", fallback="")
+logLevel = logging.INFO
+if args.log_level:
+    logLevelRaw = args.log_level
+if logLevelRaw:
+    try:
+        logLevel = int(logLevelRaw)
+    except ValueError:
+        for i in (
+            ("d", logging.DEBUG),
+            ("i", logging.INFO),
+            ("w", logging.WARNING),
+            ("e", logging.ERROR),
+            ("c", logging.CRITICAL),
+        ):
+            if str(logLevelRaw)[:1].lower() == i[0]:
+                logLevel = i[1]
+logger = getLogger(level=logLevel, stream=args.outfile)
+errLogger = getLogger(level=logLevel, stream=args.errfile)

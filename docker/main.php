@@ -49,8 +49,16 @@ function rowToHtmlTags($row) {
       $reqTagCmp = "<td class='tagIncomplete'>N</td>";
     }
   }
-  $dateDL = date("Y/m/d", $row['dateLastDownloaded']);
-  $dateEd = date("Y/m/d", $row['dateLastEdited']);
+  if ($row['dateLastDownloaded'] == 0) {
+    $dateDL = "Unknown";
+  } else {
+    $dateDL = date("Y/m/d", $row['dateLastDownloaded']);
+  }
+  if ($row['dateLastEdited'] == 0) {
+    $dateEd = "Unknown";
+  } else {
+    $dateEd = date("Y/m/d", $row['dateLastEdited']);
+  }
   $dateUp = date("Y/m/d", $row['dateLastUpdated']);
   $q2 = $dbConnect->query("SELECT * FROM tags WHERE ID=$id");
   $r2 = $q2->fetchArray(SQLITE3_ASSOC);
@@ -143,7 +151,7 @@ function rowToHtmlTags($row) {
       break;
   }
   $authorStr = $r2['authorStr'];
-  $summaryStr = $r2['summary'];
+  $summaryStr = file_get_contents("$id/summary.html");
   foreach (TAG_CATEGORIES as $value) {
     for ($i=1; $i <= 75; $i++) { 
       $j = $r2["tag$value[0]$i"];
