@@ -123,7 +123,7 @@ if ($chapter == 0 or $chapter == 1) {
     echo "<div class='notes module'>
       <h3 class='heading'>Notes:</h3>
       <blockquote class='userstuff'>
-      ".file_get_contents("$id/notes.html")."</blockquote></div>";
+      ".file_get_contents("$id/start-notes.html")."</blockquote></div>";
   }
 }
 echo "</div>"; // preface group

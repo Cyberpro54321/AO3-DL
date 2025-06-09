@@ -41,7 +41,7 @@ def processSingle(
     config: dict,
     logger: logging.Logger,
 ) -> None:
-    logger.info(f"Processing [{workID}]")
+    logger.info(f"Started Processing [{workID}]")
     sqlInfo = {}
     rawFilename = os.path.join(
         config["dirRaws"], f"{workID:0>{constants.workIdMaxDigits}}.html"
@@ -102,16 +102,17 @@ def processSingle(
     except ValueError:
         sqlInfo["chaptersExpected"] = 0
     del chapterNOs
-    dateUpdatedKey = "Updated:"
-    if sqlInfo["chaptersExpected"] == 1:
-        dateUpdatedKey = "Published:"
-    elif sqlInfo["chaptersExpected"] == sqlInfo["nchapters"]:
-        dateUpdatedKey = "Completed:"
-    sqlInfo["dateUp"] = int(
-        datetime.datetime.fromisoformat(
-            statsSplit[1 + statsSplit.index(dateUpdatedKey)]
-        ).timestamp()
-    )
+    sqlInfo["dateUp"] = 0
+    for i in ("Completed:", "Updated:", "Published"):
+        if not sqlInfo["dateUp"]:
+            try:
+                sqlInfo["dateUp"] = int(
+                    datetime.datetime.fromisoformat(
+                        statsSplit[1 + statsSplit.index(i)]
+                    ).timestamp()
+                )
+            except ValueError:
+                pass
     sqlInfo["datePb"] = int(
         datetime.datetime.fromisoformat(
             statsSplit[1 + statsSplit.index("Published:")]
@@ -179,7 +180,7 @@ def processSingle(
             logger=logger,
         )
     except AttributeError:
-        logger.debug(f"Work [{workID}] doesn't seem to have work end notes/")
+        logger.debug(f"Work [{workID}] doesn't seem to have work end notes")
     allPrefaces = rawSoup.select("#chapters > div.meta.group")
     allMains = rawSoup.select("#chapters > div.userstuff")
     allPostfaces = {}
@@ -212,7 +213,8 @@ def processSingle(
                 logger=logger,
             )
         elif len(preBQs) == 1:
-            match allPrefaces[chaptNum - 1].p.string:
+            pCandidates = allPrefaces[chaptNum - 1].select("div.meta.group > p")
+            match pCandidates[-1].string:
                 case "Chapter Notes":
                     bqDest = "notes-start.html"
                 case "Chapter Summary":
@@ -222,6 +224,7 @@ def processSingle(
                 filename=os.path.join(chaptFolder, bqDest),
                 logger=logger,
             )
+            del pCandidates
             del bqDest
         del preBQs
         tagToFile(
@@ -243,6 +246,7 @@ def processSingle(
         config=config,
         logger=logger,
     )
+    logger.info(f"Completed Processing [{workID}]")
 
 
 def multithreading(
