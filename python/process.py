@@ -66,13 +66,6 @@ def processSingle(
             tagStr = f"{tagStr[:-2]}:"
         workTagHeaders.append(tagStr)
     del workTagHeadersRaw
-    # for i in workTagHeaders:
-    #     print(i)
-    # for i in range(len(workTags)):
-    #     tagToFile(
-    #         tag=workTags[i],
-    #         filename=os.path.join(wIdFolder, f"tagDump{i}.txt"),
-    #     )
     sqlInfo["rating"] = workTags[workTagHeaders.index("Rating:")].a.string
     sqlInfo["warnings"] = []
     sqlInfo["categories"] = []
@@ -163,19 +156,16 @@ def processSingle(
             filename=os.path.join(wIdFolder, hbqDest),
         )
         del hbqDest
-    ################################
-    # WIP: Get Author String from raw
-    ################################
     sqlInfo["authors"] = []
     for tag in headerMeta.div.find_all("a"):
         sqlInfo["authors"].append(tag.string)
-    # for i in sqlInfo:
-    #     if isinstance(sqlInfo[i], list):
-    #         logger.info(f"{i}:")
-    #         for j in sqlInfo[i]:
-    #             logger.info(f"[{j}]")
-    #     else:
-    #         logger.info(f"[{i}]: [{sqlInfo[i]}]")
+    try:
+        tagToFile(
+            tag=rawSoup.find(id="afterword").find(id="endnotes").blockquote.contents,
+            filename=os.path.join(wIdFolder, "end-notes.html"),
+        )
+    except AttributeError:
+        logger.debug(f"Work [{workID}] doesn't seem to have work end notes/")
     db.addWork(
         id=workID,
         info=sqlInfo,
