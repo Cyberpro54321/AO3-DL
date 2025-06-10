@@ -109,7 +109,9 @@ echo "<link href='ao3css/sandbox.css' rel='stylesheet'>
 ";
 
 echo "<div id='ao3dlHeader'>
-<p><a href='https://archiveofourown.org/works/$id'>Link to '$title' on AO3</a></p>";
+<ul>
+<li><a href='https://archiveofourown.org/works/$id'>Link to '$title' on AO3</a></li>
+<li><a href='list.php'>Return to list of works</a></li></ul>";
 if ($rowWorks['chaptersCount'] != 1) {
   echo "<form method='get'>
   <input type='hidden' name='id' value='$id'>
@@ -119,9 +121,9 @@ if ($rowWorks['chaptersCount'] != 1) {
   for ($i=1; $i <= $rowWorks['chaptersCount']; $i++) { 
     echo "<option value='$i'>Chapter $i</option>";
   }
-  echo "</select><input type='submit'></form>";
+  echo "</select><input type='submit' value='Go'></form>";
 }
-echo "</div>";
+echo "</div>"; // ao3dlHeader
 
 echo "<div class='wrapper'>".file_get_contents("$id/tags.html")."</div>";
 echo "<div id='workskin'>";
