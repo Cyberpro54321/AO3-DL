@@ -64,6 +64,21 @@ config["dirOut"] = os.path.expanduser(
 )
 config["sqlType"] = ini.get("db", "type", fallback="sqlite")
 config["sqlLocation"] = ini.get("db", "location", fallback="main.sqlite")
+config["ao3UsernameFile"] = os.path.expanduser(
+    ini.get(
+        "ao3", "usernameFile", fallback="~/Documents/AO3-DL/secrets/username.secret"
+    )
+)
+config["ao3PasswordFile"] = os.path.expanduser(
+    ini.get(
+        "ao3", "passwordFile", fallback="~/Documents/AO3-DL/secrets/password.secret"
+    )
+)
+config["ao3SessionPickle"] = os.path.expanduser(
+    ini.get("ao3", "pickle", fallback="~/Documents/AO3-DL/secrets/session.pickle")
+)
+config["ao3DoLogin"] = ini.getboolean("ao3", "login", fallback=False)
+config["ao3DoLoginAlways"] = ini.getboolean("ao3", "loginAlways", fallback=False)
 logLevelRaw = ini.get("logs", "level", fallback="")
 logLevel = logging.INFO
 if args.log_level:
