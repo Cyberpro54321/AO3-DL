@@ -21,10 +21,21 @@ function intToArray($input) {
   }
   return $array;
 }
+function linkToWork($id, $title, $old=False) {
+  $id = str_pad($id, 8, '0', STR_PAD_LEFT);
+  $link = "";
+  if ($old) {
+    global $dirHTML;
+    $link = "$dirHTML/$id.html";
+  } else {
+    $link = "work.php?id=$id";
+  }
+  return "<a href='$link'>$title</a>";
+}
 function rowToHtmlSimple($row) {
   global $dirHTML;
   $id = str_pad($row['ID'], 8, '0', STR_PAD_LEFT);
-  $titleLink = "<td><a href=$dirHTML/$id.html>".$row['title']."</a></td>";
+  $titleLink = "<td>".linkToWork($id, $row['title'])."</td>";
   $chp1 = $row['chaptersCount'];
   $chp2 = $row['chaptersExpected'];
   if ($chp2 == 0) {
@@ -36,7 +47,7 @@ function rowToHtmlSimple($row) {
 function rowToHtmlTags($row) {
   global $dirHTML, $dbConnect;
   $id = str_pad($row['ID'], 8, '0', STR_PAD_LEFT);
-  $titleLink = "<a href=$dirHTML/$id.html>".$row['title']."</a>";
+  $titleLink = linkToWork($id, $row['title']);
   $chp1 = $row['chaptersCount'];
   $chp2 = $row['chaptersExpected'];
   if ($chp2 == 0) {
