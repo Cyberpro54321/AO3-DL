@@ -147,7 +147,7 @@ if needDlAo3Css:
 
     urlRoot = "https://raw.githubusercontent.com/otwcode/otwarchive/refs/heads/master/public/stylesheets/site/2.0/"
     for sheet in missing:
-        url = f"{urlRoot}{sheet[1]}"
+        url = f"{urlRoot}{sheet}"
         subprocess.run(
             [
                 "wget",
