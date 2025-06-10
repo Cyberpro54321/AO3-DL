@@ -52,8 +52,8 @@ for i in (
 
 copiedFiles = (
     ("config.ini", "./"),
-    ("main.css", "../docker/"),
-    ("main.php", "../docker/"),
+    ("list.css", "../docker/"),
+    ("list.php", "../docker/"),
     ("work.php", "../docker/"),
     ("index.html", "../docker/"),
 )
