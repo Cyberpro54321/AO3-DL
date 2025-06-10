@@ -49,6 +49,7 @@ copiedFiles = (
     ("config.ini", "./"),
     ("list.css", "../docker/"),
     ("list.php", "../docker/"),
+    ("work.css", "../docker/"),
     ("work.php", "../docker/"),
     ("index.html", "../docker/"),
 )

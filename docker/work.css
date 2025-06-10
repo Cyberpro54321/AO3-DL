@@ -1,0 +1,10 @@
+#ao3dlHeader {
+  border: 0.1rem dashed black;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+
+#ao3dlHeader > * {
+  margin: 0.5rem;
+}

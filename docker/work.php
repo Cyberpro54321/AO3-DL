@@ -63,6 +63,7 @@ echo "
 <title>$title - $id - AO3-DL</title>
 <meta charset='UTF-8'>
 <link rel='stylesheet' href='normalize.css'>
+<link rel='stylesheet' href='work.css'>
 <link rel='stylesheet' href='custom.css'>
 <link rel='icon' href='favicon.png'>
 ";
@@ -99,13 +100,29 @@ foreach ($css as $x) {
 }
 unset($css);
 echo "<link href='ao3css/sandbox.css' rel='stylesheet'>
-<link href='Workskins/$id.css' rel='stylesheet'>
+<link href='$id/workskin.css' rel='stylesheet'>
 </head>
 <body>
 <div id='outer' class='wrapper'>
 <div id='inner' class='wrapper'>
 <div id='main' class='works-show region' role='main'>
 ";
+
+echo "<div id='ao3dlHeader'>
+<p><a href='https://archiveofourown.org/works/$id'>Link to '$title' on AO3</a></p>";
+if ($rowWorks['chaptersCount'] != 1) {
+  echo "<form method='get'>
+  <input type='hidden' name='id' value='$id'>
+  <label for='ch'>Chapter Select:</label>
+  <select name='ch'>
+  <option value='0'>View All Chapters</option>";
+  for ($i=1; $i <= $rowWorks['chaptersCount']; $i++) { 
+    echo "<option value='$i'>Chapter $i</option>";
+  }
+  echo "</select><input type='submit'></form>";
+}
+echo "</div>";
+
 echo "<div class='wrapper'>".file_get_contents("$id/tags.html")."</div>";
 echo "<div id='workskin'>";
 echo "<div class='preface group'>
