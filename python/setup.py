@@ -125,7 +125,9 @@ missing = [
     "28-media-print.css",
 ]
 for filename in os.listdir(os.path.join(config["dirOut"], "ao3css")):
-    if filename in missing:
+    if (filename in missing) and (
+        os.path.getsize(os.path.join(config["dirOut"], "ao3css", filename))
+    ):
         missing.remove(filename)
 if len(missing) != 0:
     needDlAo3Css = True
