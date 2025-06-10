@@ -1,10 +1,13 @@
 #ao3dlHeader {
-  border: 0.1rem dashed black;
+  /* border: 0.1rem dashed black; */
   text-align: center;
   margin-bottom: 0.5rem;
   display: flex;
 }
 
 #ao3dlHeader > * {
-  margin: 0.5rem;
+  margin: 0.25rem;
+  padding: 0.25rem;
+  border: 0.15rem solid lightgray;
+  border-radius: 1rem;
 }
