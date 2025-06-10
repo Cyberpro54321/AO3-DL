@@ -137,6 +137,7 @@ else:
 if needDlAo3Css:
     doAO3CSSLoop = True
     while doAO3CSSLoop:
+        print(f"You are missing the following ao3css files: {[x for x in missing]}")
         doAO3CSS = getbool(
             "Will now download AO3 CSS files, enter Yes to continue or No to stop."
         )
