@@ -3,12 +3,9 @@
 import os.path
 import subprocess
 
-from constants import stylesheetsListLong
-import settings
+import init
 
-settings.setup()
-settings.parse()
-config = settings.settings
+config = init.config
 
 cautiousMode = False
 
@@ -40,12 +37,10 @@ def getbool(prompt: str) -> bool:
 
 for i in (
     config["dirRaws"],
-    f"{config['dirOutput']}/{config['dirOutHtml']}",
-    f"{config['dirOutput']}/{config['dirOutImg']}",
-    f"{config['dirOutput']}/{config['dirWorkskins']}",
-    f"{config['dirOutput']}/{config['dirAO3CSS']}",
+    os.path.join(config["dirOut"], "ao3css"),
     os.path.dirname(config["ao3UsernameFile"]),
     os.path.dirname(config["ao3PasswordFile"]),
+    os.path.dirname(config["ao3SessionPickle"]),
 ):
     os.makedirs(i, exist_ok=True)
 
@@ -61,7 +56,7 @@ copiedFiles = (
 
 needCopyFiles = False
 for i in copiedFiles:
-    target = abspath(f"{config['dirOutput']}/{i[0]}")
+    target = os.path.join(abspath(config["dirOut"]), i[0])
     if not os.path.exists(target):
         needCopyFiles = True
     elif not os.path.getsize(target):
@@ -72,7 +67,7 @@ if needCopyFiles:
     doCopyLoop = True
     while doCopyLoop:
         doCopy = getbool(
-            f"Will now copy the following files to {config['dirOutput']}:\n{[x[0] for x in copiedFiles]}\nEnter Yes to continue or No to stop."
+            f"Will now copy the following files to {config['dirOut']}:\n{[x[0] for x in copiedFiles]}\nEnter Yes to continue or No to stop."
         )
         if doCopy:
             doCopyLoop = False
@@ -80,7 +75,7 @@ if needCopyFiles:
             raise Exception("Operation canceled by user.")
     for i in copiedFiles:
         local = abspath(f"{i[1]}{i[0]}")
-        target = abspath(f"{config['dirOutput']}/{i[0]}")
+        target = abspath(f"{config['dirOut']}/{i[0]}")
         # print(f"Local: {local} Target: {target}")
         if os.path.exists(local):
             if local != target:
@@ -101,10 +96,35 @@ else:
 
 
 needDlAo3Css = False
-missing = []
-for sheet in stylesheetsListLong:
-    missing.append(sheet[1])
-for filename in os.listdir(f"{config['dirOutput']}/{config['dirAO3CSS']}"):
+missing = [
+    "01-core.css",
+    "02-elements.css",
+    "03-region-header.css",
+    "04-region-dashboard.css",
+    "05-region-main.css",
+    "06-region-footer.css",
+    "07-interactions.css",
+    "08-actions.css",
+    "09-roles-states.css",
+    "10-types-groups.css",
+    "11-group-listbox.css",
+    "12-group-meta.css",
+    "13-group-blurb.css",
+    "14-group-preface.css",
+    "15-group-comments.css",
+    "16-zone-system.css",
+    "17-zone-home.css",
+    "18-zone-searchbrowse.css",
+    "19-zone-tags.css",
+    "20-zone-translation.css",
+    "21-userstuff.css",
+    "22-system-messages.css",
+    "25-media-midsize.css",
+    "26-media-narrow.css",
+    "27-media-aural.css",
+    "28-media-print.css",
+]
+for filename in os.listdir(os.path.join(config["dirOut"], "ao3css")):
     if filename in missing:
         missing.remove(filename)
 if len(missing) != 0:
@@ -124,13 +144,13 @@ if needDlAo3Css:
             raise Exception("Operation canceled by user.")
 
     urlRoot = "https://raw.githubusercontent.com/otwcode/otwarchive/refs/heads/master/public/stylesheets/site/2.0/"
-    for sheet in stylesheetsListLong:
+    for sheet in missing:
         url = f"{urlRoot}{sheet[1]}"
         subprocess.run(
             [
                 "wget",
                 "-O",
-                f"{config['dirOutput']}/{config['dirAO3CSS']}/{sheet[1]}",
+                os.path.join(config["dirOut"], "ao3css", sheet),
                 url,
             ]
         )
