@@ -189,44 +189,54 @@ def processSingle(
             allPostfaces[i] = rawSoup.find(id=f"endnotes{i}")
         except KeyError:
             logger.debug(f"Work [{workID}] Chapter [{i}] doesn't seem to have endnotes")
-    for chaptNum in range(1, 1 + len(allPrefaces)):
+    logger.debug(
+        f"Pref/Main/Post for [{workID}]: [{len(allPrefaces)}] [{len(allMains)}] [{len(allPostfaces)}]"
+    )
+    for chaptNum in range(1, 1 + len(allMains)):
         chaptFolder = os.path.join(wIdFolder, str(chaptNum))
         os.makedirs(chaptFolder, exist_ok=True)
         ################################
         # Real
         ################################
-        tagToFile(
-            tag=allPrefaces[chaptNum - 1].h2.string,
-            filename=os.path.join(chaptFolder, "title.txt"),
-            logger=logger,
-        )
-        preBQs = allPrefaces[chaptNum - 1].find_all("blockquote")
-        if len(preBQs) == 2:
+        if len(allPrefaces) != 0:
             tagToFile(
-                tag=preBQs[0].contents,
-                filename=os.path.join(chaptFolder, "summary.html"),
+                tag=allPrefaces[chaptNum - 1].h2.string,
+                filename=os.path.join(chaptFolder, "title.txt"),
                 logger=logger,
             )
-            tagToFile(
-                tag=preBQs[1].contents,
-                filename=os.path.join(chaptFolder, "notes-start.html"),
-                logger=logger,
+            preBQs = allPrefaces[chaptNum - 1].find_all("blockquote")
+            if len(preBQs) == 2:
+                tagToFile(
+                    tag=preBQs[0].contents,
+                    filename=os.path.join(chaptFolder, "summary.html"),
+                    logger=logger,
+                )
+                tagToFile(
+                    tag=preBQs[1].contents,
+                    filename=os.path.join(chaptFolder, "notes-start.html"),
+                    logger=logger,
+                )
+            elif len(preBQs) == 1:
+                pCandidates = allPrefaces[chaptNum - 1].select("div.meta.group > p")
+                match pCandidates[-1].string:
+                    case "Chapter Notes":
+                        bqDest = "notes-start.html"
+                    case "Chapter Summary":
+                        bqDest = "summary.html"
+                tagToFile(
+                    tag=preBQs[0].contents,
+                    filename=os.path.join(chaptFolder, bqDest),
+                    logger=logger,
+                )
+                del pCandidates
+                del bqDest
+            del preBQs
+        elif len(allMains) == 1 and sqlInfo["nchapters"] == 1:
+            logger.debug(f"Work [{workID}] seems to be a oneshot")
+        else:
+            logger.error(
+                f"Work [{workID}], which doesn't seem to be a oneshot, had a len(allPrefaces) of 0"
             )
-        elif len(preBQs) == 1:
-            pCandidates = allPrefaces[chaptNum - 1].select("div.meta.group > p")
-            match pCandidates[-1].string:
-                case "Chapter Notes":
-                    bqDest = "notes-start.html"
-                case "Chapter Summary":
-                    bqDest = "summary.html"
-            tagToFile(
-                tag=preBQs[0].contents,
-                filename=os.path.join(chaptFolder, bqDest),
-                logger=logger,
-            )
-            del pCandidates
-            del bqDest
-        del preBQs
         tagToFile(
             tag=allMains[chaptNum - 1].contents,
             filename=os.path.join(chaptFolder, "main.html"),

@@ -1,10 +1,12 @@
 <?php
 
-function displayChapter($num) {
+function displayChapter($num, $oneshot=False) {
   global $id;
   echo "<div id='chapter-$num' class='chapter'>";
   echo "<div class='chapter preface group'>";
-  echo "<h3 class='title'>Chapter $num: ".file_get_contents("$id/$num/title.txt")."</h3>";
+  if (!$oneshot) {
+    echo "<h3 class='title'>Chapter $num: ".file_get_contents("$id/$num/title.txt")."</h3>";
+  }
   if (file_exists("$id/$num/summary.html")) {
     echo "<div id='summary' class='summary module'>
     <h3 class='heading'>Summary:</h3>
@@ -148,12 +150,14 @@ if ($chapter == 0 or $chapter == 1) {
 echo "</div>"; // preface group
 
 echo "<div id='chapters' role='article'>";
+
+$oneshot = $rowWorks['chaptersCount'] == 1;
 if ($chapter == 0) {
   for ($i = 1; $i <= $rowWorks['chaptersCount']; $i++) { 
-    displayChapter($i);
+    displayChapter($i, $oneshot);
   }
 } else {
-  displayChapter($chapter);
+  displayChapter($chapter, $oneshot);
 }
 echo "</div>";
 echo "<div class='afterword preface group'>";
