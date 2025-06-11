@@ -103,7 +103,7 @@ def processSingle(
         sqlInfo["chaptersExpected"] = 0
     del chapterNOs
     sqlInfo["dateUp"] = 0
-    for i in ("Completed:", "Updated:", "Published"):
+    for i in ("Completed:", "Updated:", "Published:"):
         if not sqlInfo["dateUp"]:
             try:
                 sqlInfo["dateUp"] = int(
@@ -113,6 +113,8 @@ def processSingle(
                 )
             except ValueError:
                 pass
+    if not sqlInfo["dateUp"]:
+        logger.error(f"Date Updated couldn't be found in work [{workID}]")
     sqlInfo["datePb"] = int(
         datetime.datetime.fromisoformat(
             statsSplit[1 + statsSplit.index("Published:")]
