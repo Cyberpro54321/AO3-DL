@@ -290,6 +290,7 @@ def multithreading(
 
 
 if __name__ == "__main__":
+    init.init()
     workIDs = set(())
     for line in init.args.infile:
         try:

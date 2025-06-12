@@ -34,67 +34,72 @@ def getLogger(
     return logger
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--infile", "-i", nargs="?", type=argparse.FileType("r"), default=sys.stdin
-)
-parser.add_argument(
-    "--outfile", "-o", nargs="?", type=argparse.FileType("w"), default=sys.stdout
-)
-parser.add_argument(
-    "--errfile", "-e", nargs="?", type=argparse.FileType("w"), default=sys.stderr
-)
-parser.add_argument("--log-level", "-l", default="")
-args = parser.parse_args()
+def init():
+    global args
+    global config
+    global logger
+    global errLogger
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--infile", "-i", nargs="?", type=argparse.FileType("r"), default=sys.stdin
+    )
+    parser.add_argument(
+        "--outfile", "-o", nargs="?", type=argparse.FileType("w"), default=sys.stdout
+    )
+    parser.add_argument(
+        "--errfile", "-e", nargs="?", type=argparse.FileType("w"), default=sys.stderr
+    )
+    parser.add_argument("--log-level", "-l", default="")
+    args = parser.parse_args()
 
-ini = configparser.ConfigParser()
-ini.read(
-    [
-        "/etc/ao3-dl/config.ini",
-        os.path.expanduser("~/.config/ao3-dl/config.ini"),
-        "config.ini",
-    ]
-)
-config = {}
-config["dirRaws"] = os.path.expanduser(
-    ini.get("dir", "raws", fallback="~/Documents/AO3-DL/Raws/")
-)
-config["dirOut"] = os.path.expanduser(
-    ini.get("dir", "out", fallback="~/Documents/AO3-DL/Output/")
-)
-config["sqlType"] = ini.get("db", "type", fallback="sqlite")
-config["sqlLocation"] = ini.get("db", "location", fallback="main.sqlite")
-config["ao3UsernameFile"] = os.path.expanduser(
-    ini.get(
-        "ao3", "usernameFile", fallback="~/Documents/AO3-DL/secrets/username.secret"
+    ini = configparser.ConfigParser()
+    ini.read(
+        [
+            "/etc/ao3-dl/config.ini",
+            os.path.expanduser("~/.config/ao3-dl/config.ini"),
+            "config.ini",
+        ]
     )
-)
-config["ao3PasswordFile"] = os.path.expanduser(
-    ini.get(
-        "ao3", "passwordFile", fallback="~/Documents/AO3-DL/secrets/password.secret"
+    config = {}
+    config["dirRaws"] = os.path.expanduser(
+        ini.get("dir", "raws", fallback="~/Documents/AO3-DL/Raws/")
     )
-)
-config["ao3SessionPickle"] = os.path.expanduser(
-    ini.get("ao3", "pickle", fallback="~/Documents/AO3-DL/secrets/session.pickle")
-)
-config["ao3DoLogin"] = ini.getboolean("ao3", "login", fallback=False)
-config["ao3DoLoginAlways"] = ini.getboolean("ao3", "loginAlways", fallback=False)
-logLevelRaw = ini.get("logs", "level", fallback="")
-logLevel = logging.INFO
-if args.log_level:
-    logLevelRaw = args.log_level
-if logLevelRaw:
-    try:
-        logLevel = int(logLevelRaw)
-    except ValueError:
-        for i in (
-            ("d", logging.DEBUG),
-            ("i", logging.INFO),
-            ("w", logging.WARNING),
-            ("e", logging.ERROR),
-            ("c", logging.CRITICAL),
-        ):
-            if str(logLevelRaw)[:1].lower() == i[0]:
-                logLevel = i[1]
-logger = getLogger(level=logLevel, stream=args.outfile)
-errLogger = getLogger(level=logLevel, stream=args.errfile)
+    config["dirOut"] = os.path.expanduser(
+        ini.get("dir", "out", fallback="~/Documents/AO3-DL/Output/")
+    )
+    config["sqlType"] = ini.get("db", "type", fallback="sqlite")
+    config["sqlLocation"] = ini.get("db", "location", fallback="main.sqlite")
+    config["ao3UsernameFile"] = os.path.expanduser(
+        ini.get(
+            "ao3", "usernameFile", fallback="~/Documents/AO3-DL/secrets/username.secret"
+        )
+    )
+    config["ao3PasswordFile"] = os.path.expanduser(
+        ini.get(
+            "ao3", "passwordFile", fallback="~/Documents/AO3-DL/secrets/password.secret"
+        )
+    )
+    config["ao3SessionPickle"] = os.path.expanduser(
+        ini.get("ao3", "pickle", fallback="~/Documents/AO3-DL/secrets/session.pickle")
+    )
+    config["ao3DoLogin"] = ini.getboolean("ao3", "login", fallback=False)
+    config["ao3DoLoginAlways"] = ini.getboolean("ao3", "loginAlways", fallback=False)
+    logLevelRaw = ini.get("logs", "level", fallback="")
+    logLevel = logging.INFO
+    if args.log_level:
+        logLevelRaw = args.log_level
+    if logLevelRaw:
+        try:
+            logLevel = int(logLevelRaw)
+        except ValueError:
+            for i in (
+                ("d", logging.DEBUG),
+                ("i", logging.INFO),
+                ("w", logging.WARNING),
+                ("e", logging.ERROR),
+                ("c", logging.CRITICAL),
+            ):
+                if str(logLevelRaw)[:1].lower() == i[0]:
+                    logLevel = i[1]
+    logger = getLogger(level=logLevel, stream=args.outfile)
+    errLogger = getLogger(level=logLevel, stream=args.errfile)

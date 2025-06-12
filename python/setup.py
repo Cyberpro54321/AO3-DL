@@ -5,6 +5,7 @@ import subprocess
 
 import init
 
+init.init()
 config = init.config
 
 cautiousMode = False
