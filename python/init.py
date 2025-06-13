@@ -79,7 +79,7 @@ def init(
         [
             "/etc/ao3-dl/config.ini",
             os.path.expanduser("~/.config/ao3-dl/config.ini"),
-            "config.ini",
+            os.path.join(os.path.dirname(__file__), "config.ini"),
         ]
     )
     config = {}
