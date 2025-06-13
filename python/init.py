@@ -34,21 +34,43 @@ def getLogger(
     return logger
 
 
-def init():
+def init(
+    json: str = "",
+) -> None:
     global args
     global config
     global logger
     global errLogger
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--infile", "-i", nargs="?", type=argparse.FileType("r"), default=sys.stdin
+        "--infile",
+        "-i",
+        nargs="?",
+        type=argparse.FileType("r"),
+        default=sys.stdin,
     )
     parser.add_argument(
-        "--outfile", "-o", nargs="?", type=argparse.FileType("w"), default=sys.stdout
+        "--outfile",
+        "-o",
+        nargs="?",
+        type=argparse.FileType("w"),
+        default=sys.stdout,
     )
     parser.add_argument(
-        "--errfile", "-e", nargs="?", type=argparse.FileType("w"), default=sys.stderr
+        "--errfile",
+        "-e",
+        nargs="?",
+        type=argparse.FileType("w"),
+        default=sys.stderr,
     )
+    if json:
+        parser.add_argument(
+            "--json",
+            "-j",
+            nargs=1,
+            type=argparse.FileType(json),
+            help="JSON file containing a whitelist and/or blacklist of works to include.",
+        )
     parser.add_argument("--log-level", "-l", default="")
     args = parser.parse_args()
 
