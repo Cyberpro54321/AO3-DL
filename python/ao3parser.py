@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import concurrent.futures
 import json
 
 import AO3
@@ -129,3 +130,48 @@ for seriesID in seriesIDs:
     logger.info(f"SeriesID [{seriesID}]")
 for author in authors:
     logger.info(f"Author [{author}]")
+
+futures = {
+    "Work": {},
+    "Series": {},
+    "Author": {},
+}
+
+with concurrent.futures.ThreadPoolExecutor(
+    max_workers=10, thread_name_prefix=constants.threadNameBulk
+) as pool1:
+    for workID in workIDs:
+        futures["Work"][workID] = pool1.submit(download.getWorkObj, workID, logger)
+    for seriesID in seriesIDs:
+        futures["Series"][seriesID] = pool1.submit(getSeriesObj, seriesID, logger)
+    for author in authors:
+        futures["Author"][author] = pool1.submit(getAuthorObj, author, logger)
+
+workObjs = []
+seriesObjs = []
+authorObjs = []
+for category in futures:
+    for item in futures[category]:
+        try:
+            result = futures[category][item].result()
+        except (UserWarning,):
+            pass
+        except (Exception,) as ex:
+            init.errLogger.error(
+                f"{category} [{item}] raised [{type(ex).__name__}]: [{ex.args}]"
+            )
+        else:
+            match category:
+                case "Work":
+                    workObjs.append(result)
+                case "Series":
+                    seriesObjs.append(result)
+                case "Author":
+                    authorObjs.append(result)
+
+for authorObj in authorObjs:
+    works = author.get_works()
+    if len(works) != author.works:
+        raise Exception
+    for work in works:
+        pass
