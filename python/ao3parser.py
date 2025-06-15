@@ -14,8 +14,8 @@ workIDs = set(())
 seriesIDs = set(())
 authors = set(())
 
-for lineRaw in init.args.infile:
-    line = str(lineRaw).strip()
+inRaw = init.parseInfile(init.args.infile, init.errLogger)
+for line in inRaw:
     if line.isdecimal():
         init.logger.warning(
             f"Plain int [{line}] passed to parser.py, assuming it is a workID."
