@@ -125,3 +125,13 @@ def init(
                     logLevel = i[1]
     logger = getLogger(level=logLevel, stream=args.outfile)
     errLogger = getLogger(level=logLevel, stream=args.errfile)
+
+
+def parseInfile(infile, errLogger: logging.Logger) -> set:
+    out = set(())
+    for line in infile:
+        try:
+            out.add(int(str(line).strip()))
+        except ValueError:
+            errLogger.error(f"Could not convert input [{str(line).strip()}] to int")
+    return out

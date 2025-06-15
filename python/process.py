@@ -291,14 +291,7 @@ def multithreading(
 
 if __name__ == "__main__":
     init.init()
-    workIDs = set(())
-    for line in init.args.infile:
-        try:
-            workIDs.add(int(str(line).strip()))
-        except ValueError:
-            init.errLogger.error(
-                f"Could not convert input [{str(line).strip()}] to int"
-            )
+    workIDs = init.parseInfile(init.args.infile, errLogger=init.errLogger)
     multithreading(
         workIDs=workIDs,
         config=init.config,
