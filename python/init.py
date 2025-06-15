@@ -132,8 +132,5 @@ def parseInfile(infile, errLogger: logging.Logger) -> set:
     for lineRaw in infile:
         line = str(lineRaw).split("#")[0].strip()
         if line:
-            try:
-                out.add(int(line))
-            except ValueError:
-                errLogger.error(f"Could not convert input [{line}] to int")
+            out.add(line)
     return out
