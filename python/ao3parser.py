@@ -14,9 +14,10 @@ import init
 def getSeriesObj(
     seriesID,
     logger: init.logging.Logger,
-    retries: int = constants.loopRetries,
-    ao3Session: AO3.Session = None,
-    tryAnon: bool = True,
+    errLogger: init.logging.Logger,
+    retries: int,
+    ao3Session: AO3.Session,
+    tryAnon: bool,
 ) -> AO3.Series:
     loopNo = 1
     if tryAnon:
@@ -27,9 +28,23 @@ def getSeriesObj(
         try:
             logger.log(
                 (10 + (20 * int(loopNo > 9))),
-                f"Attempt [{loopNo}] getting AO3.Series object [{workID}]",
+                f"Attempt [{loopNo}] getting AO3.Series object [{seriesID}]",
             )
             series = AO3.Series(seriesid=seriesID, session=ao3SessionInUse)
+        except AO3.utils.PrivateWorkError:
+            if ao3SessionInUse:
+                errStr = f"Series [{seriesID}] threw PrivateWorkError despite valid ao3SessionInUse???"
+                errLogger.critical(errStr)
+                raise Exception(errStr)
+            else:
+                if ao3Session:
+                    ao3SessionInUse = ao3Session
+                    logStr = f"Series [{seriesID}] requires login, will now use provided AO3.Session."
+                    logger.info(logStr)
+                else:
+                    errStr = f"Series [{seriesID}] requires login but no AO3.Session was provided."
+                    errLogger.critical(errStr)
+                    raise Exception(errStr)
         except (AO3.utils.HTTPError,) as ex:
             download.loopWait(
                 loopNo=loopNo,
@@ -39,6 +54,7 @@ def getSeriesObj(
                 errLevel=init.logging.INFO,
                 logger=logger,
             )
+            loopNo += 1
         else:
             logger.info(f"Got AO3.Series object [{seriesID}]")
             loopNo = retries * 10
@@ -50,10 +66,19 @@ def getSeriesWorks(
     logger: init.logging.Logger,
     errLogger: init.logging.Logger = None,
     retries: int = constants.loopRetries,
+    session: AO3.Session = None,
+    tryAnon: bool = True,
 ) -> set:
     if not errLogger:
         errLogger = logger
-    series = getSeriesObj(seriesID=seriesID, logger=logger, retries=retries)
+    series = getSeriesObj(
+        seriesID=seriesID,
+        logger=logger,
+        errLogger=errLogger,
+        retries=retries,
+        ao3Session=session,
+        tryAnon=tryAnon,
+    )
     outWorks = []
     outWorks.extend(series.work_list)
     pagesCount = 1
@@ -62,7 +87,12 @@ def getSeriesWorks(
         pagesCount = pagesSet[0] + int(bool(pagesSet[1]))
         for i in range(2, 1 + pagesCount):
             page = getSeriesObj(
-                seriesID=f"{seriesID}?page={i}", logger=logger, retries=retries
+                seriesID=f"{seriesID}?page={i}",
+                logger=logger,
+                errLogger=errLogger,
+                retries=retries,
+                ao3Session=session,
+                tryAnon=tryAnon,
             )
             outWorks.extend(page.work_list)
     if series.nworks != len(outWorks):
@@ -104,6 +134,7 @@ def getAuthorObj(
                 errLevel=init.logging.INFO,
                 logger=logger,
             )
+            loopNo += 1
         else:
             logger.info(f"Got AO3.User object [{username}]")
             loopNo = retries * 10
