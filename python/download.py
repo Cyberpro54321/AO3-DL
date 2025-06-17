@@ -1,4 +1,3 @@
-import logging
 import os.path
 import pickle
 import random
@@ -15,7 +14,7 @@ def loopWait(
     ex: Exception,
     goal: str,
     errLevel: int,
-    logger: logging.Logger,
+    logger: init.logging.Logger,
     id: str = "",
 ) -> None:
     random.seed()
@@ -39,11 +38,14 @@ def loopWait(
 
 def getWorkObj(
     workID: int,
-    logger: logging.Logger,
+    logger: init.logging.Logger,
+    errLogger: init.logging.Logger = None,
     retries: int = constants.loopRetries,
     ao3Session: AO3.Session = None,
     tryAnon: bool = True,
 ) -> AO3.Work:
+    if not errLogger:
+        errLogger = logger
     loopNo = 1
     if tryAnon:
         ao3SessionInUse = None
@@ -61,13 +63,27 @@ def getWorkObj(
                 load=True,
                 load_chapters=False,
             )
+        except AO3.utils.PrivateWorkError:
+            if ao3SessionInUse:
+                errStr = f"Work [{workID}] threw PrivateWorkError despite valid ao3SessionInUse???"
+                errLogger.critical(errStr)
+                raise Exception(errStr)
+            else:
+                if ao3Session:
+                    ao3SessionInUse = ao3Session
+                    logStr = f"Work [{workID}] requires login, will now use provided AO3.Session."
+                    logger.info(logStr)
+                else:
+                    errStr = f"Work [{workID}] requires login but no AO3.Session was provided."
+                    errLogger.critical(errStr)
+                    raise Exception(errStr)
         except (AttributeError,) as ex:
             loopWait(
                 loopNo=loopNo,
                 ex=ex,
                 goal="AO3.Work",
                 id=str(workID),
-                errLevel=logging.INFO,
+                errLevel=init.logging.INFO,
                 logger=logger,
             )
             loopNo += 1
@@ -130,7 +146,7 @@ def getSessionObj(
                 loopNo=loopNo,
                 ex=ex,
                 goal="AO3.Session",
-                errLevel=logging.INFO,
+                errLevel=init.logging.INFO,
                 logger=logger,
             )
             loopNo += 1
