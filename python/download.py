@@ -92,7 +92,8 @@ def getSessionObj(
         and os.path.exists(pickleFilepath)
         and os.path.getsize(pickleFilepath)
     ):
-        session = pickle.load(pickleFilepath)
+        with open(pickleFilepath, "rb") as file:
+            session = pickle.load(file)
         return session
     usernameExists = bool(
         os.path.exists(usernameFilepath) and os.path.getsize(usernameFilepath)
@@ -137,6 +138,7 @@ def getSessionObj(
             logger.info("Got AO3.Session object")
             loopNo = retries * 10
     if pickleFilepath:
-        os.makedirs(os.path.dirname(pickleFilepath), exists_ok=True)
-        pickle.dump(session, pickleFilepath)
+        os.makedirs(os.path.dirname(pickleFilepath), exist_ok=True)
+        with open(pickleFilepath, "wb") as file:
+            pickle.dump(session, file)
     return session
