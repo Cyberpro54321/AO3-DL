@@ -216,12 +216,28 @@ for author in authors:
 futuresSeries = {}
 futuresAuthors = {}
 
+if config["ao3DoLogin"]:
+    session = download.getSessionObj(
+        usernameFilepath=config["ao3UsernameFile"],
+        passwordFilepath=config["ao3PasswordFile"],
+        logger=init.logger,
+        errLogger=init.errLogger,
+        pickleFilepath=config["ao3SessionPickle"],
+    )
+else:
+    session = None
+
 with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix=constants.threadNameBulk
 ) as pool1:
     for seriesID in seriesIDs:
         futuresSeries[seriesID] = pool1.submit(
-            getSeriesWorks, seriesID, init.logger, init.errLogger
+            getSeriesWorks,
+            seriesID,
+            init.logger,
+            init.errLogger,
+            session=session,
+            tryAnon=(not config["ao3DoLoginAlways"]),
         )
     for author in authors:
         futuresAuthors[author] = pool1.submit(
