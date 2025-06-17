@@ -150,7 +150,22 @@ def getAuthorWorks(
     if not errLogger:
         errLogger = logger
     author = getAuthorObj(username=username, logger=logger, retries=retries)
-    works = author.get_works()
+    loopNo = 1
+    while loopNo <= retries:
+        try:
+            works = author.get_works()
+        except AO3.utils.HTTPError as ex:
+            download.loopWait(
+                loopNo=loopNo,
+                ex=ex,
+                goal="AO3.User.get_works()",
+                id=str(username),
+                errLevel=init.logging.INFO,
+                logger=logger,
+            )
+            loopNo += 1
+        else:
+            loopNo = retries * 10
     if len(works) != author.works:
         errStr = f"Author [{author.username}] claims to have [{author.works}] works, but User.get_works() returned only [{len(works)}] works."
         errLogger.critical(errStr)
