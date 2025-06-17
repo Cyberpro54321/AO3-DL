@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import concurrent.futures
 import json
+import traceback
 
 import AO3
 import bs4
@@ -11,7 +12,7 @@ import init
 
 
 def getSeriesObj(
-    seriesID: int,
+    seriesID,
     logger: init.logging.Logger,
     retries: int = constants.loopRetries,
     ao3Session: AO3.Session = None,
@@ -29,7 +30,7 @@ def getSeriesObj(
                 f"Attempt [{loopNo}] getting AO3.Series object [{workID}]",
             )
             series = AO3.Series(seriesid=seriesID, session=ao3SessionInUse)
-        except (AttributeError,) as ex:
+        except (AO3.utils.HTTPError,) as ex:
             download.loopWait(
                 loopNo=loopNo,
                 ex=ex,
@@ -42,6 +43,37 @@ def getSeriesObj(
             logger.info(f"Got AO3.Series object [{seriesID}]")
             loopNo = retries * 10
             return series
+
+
+def getSeriesWorks(
+    seriesID: int,
+    logger: init.logging.Logger,
+    errLogger: init.logging.Logger = None,
+    retries: int = constants.loopRetries,
+) -> set:
+    if not errLogger:
+        errLogger = logger
+    series = getSeriesObj(seriesID=seriesID, logger=logger, retries=retries)
+    outWorks = []
+    outWorks.extend(series.work_list)
+    pagesCount = 1
+    if series.nworks != len(series.work_list):
+        pagesSet = divmod(series.nworks, constants.ao3WorksPerSeriesPage)
+        pagesCount = pagesSet[0] + int(bool(pagesSet[1]))
+        for i in range(2, 1 + pagesCount):
+            page = getSeriesObj(
+                seriesID=f"{seriesID}?page={i}", logger=logger, retries=retries
+            )
+            outWorks.extend(page.work_list)
+    if series.nworks != len(outWorks):
+        errLogger.error(
+            f"Series [{seriesID}] nworks [{series.nworks}] != len(work_list) [{len(outWorks)}] after loading [{pagesCount -1}] more pages."
+        )
+        errLogger.error(f"[{seriesID}]: [{outWorks}]")
+    outSet = set(())
+    for work in outWorks:
+        outSet.add(work.id)
+    return outSet
 
 
 def getAuthorObj(
@@ -63,7 +95,7 @@ def getAuthorObj(
                 f"Attempt [{loopNo}] getting AO3.User object [{username}]",
             )
             author = AO3.User(username=username, session=ao3SessionInUse)
-        except (AttributeError,) as ex:
+        except (AO3.utils.HTTPError,) as ex:
             download.loopWait(
                 loopNo=loopNo,
                 ex=ex,
@@ -78,8 +110,27 @@ def getAuthorObj(
             return author
 
 
+def getAuthorWorks(
+    username: str,
+    logger: init.logging.Logger,
+    errLogger: init.logging.Logger = None,
+    retries: int = constants.loopRetries,
+) -> set:
+    if not errLogger:
+        errLogger = logger
+    author = getAuthorObj(username=username, logger=logger, retries=retries)
+    works = author.get_works()
+    if len(works) != author.works:
+        errStr = f"Author [{author.username}] claims to have [{author.works}] works, but User.get_works() returned only [{len(works)}] works."
+        errLogger.critical(errStr)
+        raise Exception(errStr)
+    outSet = set(())
+    for work in works:
+        outSet.add(work.id)
+    return outSet
+
+
 init.init(json="r")
-logger = init.logger
 config = init.config
 
 workIDs = set(())
@@ -108,15 +159,15 @@ for line in inRaw:
         match split[3]:
             case "works":
                 workID = int(split[4])
-                logger.debug(f"Parsed [{line}] into workID [{workID}]")
+                init.logger.debug(f"Parsed [{line}] into workID [{workID}]")
                 workIDs.add(workID)
             case "series":
                 seriesID = int(split[4])
-                logger.debug(f"Parsed [{line}] into seriesID [{seriesID}]")
+                init.logger.debug(f"Parsed [{line}] into seriesID [{seriesID}]")
                 seriesIDs.add(seriesID)
             case "users":
                 author = str(split[4])
-                logger.debug(f"Parsed [{line}] into author [{author}]")
+                init.logger.debug(f"Parsed [{line}] into author [{author}]")
                 authors.add(author)
     else:
         authors.add(line)
@@ -125,11 +176,11 @@ for line in inRaw:
         )
 
 for workID in workIDs:
-    logger.info(f"WorkID [{workID}]")
+    init.logger.info(f"WorkID [{workID}]")
 for seriesID in seriesIDs:
-    logger.info(f"SeriesID [{seriesID}]")
+    init.logger.info(f"SeriesID [{seriesID}]")
 for author in authors:
-    logger.info(f"Author [{author}]")
+    init.logger.info(f"Author [{author}]")
 
 futuresSeries = {}
 futuresAuthors = {}
@@ -138,12 +189,18 @@ with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix=constants.threadNameBulk
 ) as pool1:
     for seriesID in seriesIDs:
-        futuresSeries[seriesID] = pool1.submit(getSeriesObj, seriesID, logger)
+        futuresSeries[seriesID] = pool1.submit(
+            getSeriesWorks, seriesID, init.logger, init.errLogger
+        )
     for author in authors:
-        futuresAuthors[author] = pool1.submit(getAuthorObj, author, logger)
+        futuresAuthors[author] = pool1.submit(
+            getAuthorWorks, author, init.logger, init.errLogger
+        )
 
-seriesObjs = []
-authorObjs = []
+init.logger.info("Retreiving from futures...")
+
+seriesContents = []
+authorContents = []
 for series in futuresSeries:
     try:
         result = futuresSeries[series].result()
@@ -151,8 +208,9 @@ for series in futuresSeries:
         init.errLogger.error(
             f"Series [{series}] raised [{type(ex).__name__}]: [{ex.args}]"
         )
+        traceback.print_exception(ex)
     else:
-        seriesObjs.append(result)
+        seriesContents.append(result)
 for author in futuresAuthors:
     try:
         result = futuresAuthors[author].result()
@@ -160,28 +218,24 @@ for author in futuresAuthors:
         init.errLogger.error(
             f"Author [{author}] raised [{type(ex).__name__}]: [{ex.args}]"
         )
+        traceback.print_exception(ex)
     else:
-        authorObjs.append(result)
+        authorContents.append(result)
 
-for seriesObj in seriesObjs:
-    if len(seriesObj.work_list) != seriesObj.nworks:
-        errStr = f"Series [{seriesObj.id} - {seriesObj.name}] claims to have [{seriesObj.nworks}] works, but Series.work_list returned only [{len(seriesObj.work_list)}] works."
-        init.errLogger.critical(errStr)
-        raise Exception(errStr)
-for authorObj in authorObjs:
-    works = author.get_works()
-    if len(works) != author.works:
-        errStr = f"Author [{author.username}] claims to have [{author.works}] works, but User.get_works() returned only [{len(works)}] works."
-        init.errLogger.critical(errStr)
-        raise Exception(errStr)
-    for work in works:
-        workIDs.add(work.id)
+for series in seriesContents:
+    for workID in series:
+        workIDs.add(workID)
+for author in authorContents:
+    for workID in author:
+        workIDs.add(workID)
 
+for workID in workIDs:
+    init.logger.info(f"WorkID [{workID}]")
 
-futuresWorks = {}
-workObjs = []
-with concurrent.futures.ThreadPoolExecutor(
-    max_workers=10, thread_name_prefix=constants.threadNameBulk
-) as pool2:
-    for workID in workIDs:
-        futuresWorks[workID] = pool2.submit(download.getWorkObj, workID, logger)
+# futuresWorks = {}
+# workObjs = []
+# with concurrent.futures.ThreadPoolExecutor(
+#     max_workers=10, thread_name_prefix=constants.threadNameBulk
+# ) as pool2:
+#     for workID in workIDs:
+#         futuresWorks[workID] = pool2.submit(download.getWorkObj, workID, logger)
