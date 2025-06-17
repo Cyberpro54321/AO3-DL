@@ -1,4 +1,5 @@
 import logging
+import os.path
 import pickle
 import random
 import time
@@ -6,23 +7,28 @@ import time
 import AO3
 
 import constants
+import init
 
 
 def loopWait(
     loopNo: int,
     ex: Exception,
     goal: str,
-    id: str,
     errLevel: int,
     logger: logging.Logger,
+    id: str = "",
 ) -> None:
     random.seed()
     pauseMult = 0.5 + random.random()
     pauseTime = int(loopNo * 5 * pauseMult)
+    if id:
+        string = f"getting {goal} obj for [{id}]"
+    else:
+        string = f"getting {goal} obj"
     logger.log(
         errLevel,
         constants.loopErrorTemplate.format(
-            f"getting {goal} obj for [{id}]",
+            string,
             pauseTime,
             type(ex).__name__,
             ex.args,
@@ -64,11 +70,73 @@ def getWorkObj(
                 errLevel=logging.INFO,
                 logger=logger,
             )
+            loopNo += 1
         else:
             logger.info(f"Got AO3.Work object [{workID}]")
             loopNo = retries * 10
             return work
 
 
-def getSessionObj():
-    pass
+def getSessionObj(
+    usernameFilepath: str,
+    passwordFilepath: str,
+    logger: init.logging.Logger,
+    errLogger: init.logging.Logger = None,
+    pickleFilepath: str = "",
+    retries: int = constants.loopRetries,
+) -> AO3.Session:
+    if not errLogger:
+        errLogger = logger
+    if (
+        pickleFilepath
+        and os.path.exists(pickleFilepath)
+        and os.path.getsize(pickleFilepath)
+    ):
+        session = pickle.load(pickleFilepath)
+        return session
+    usernameExists = bool(
+        os.path.exists(usernameFilepath) and os.path.getsize(usernameFilepath)
+    )
+    passwordExists = bool(
+        os.path.exists(passwordFilepath) and os.path.getsize(passwordFilepath)
+    )
+    if (not usernameExists) and (not passwordExists):
+        errStr = f"Username & password files [{usernameFilepath}] and [{passwordFilepath}] either don't exist or are 0 bytes long."
+        errLogger.critical(errStr)
+        raise Exception(errStr)
+    if not usernameExists:
+        errStr = f"Username file [{usernameFilepath}] either doesn't exist or is 0 bytes long."
+        errLogger.critical(errStr)
+        raise Exception(errStr)
+    if not passwordExists:
+        errStr = f"Password file [{passwordFilepath}] either doesn't exist or is 0 bytes long."
+        errLogger.critical(errStr)
+        raise Exception(errStr)
+    loopNo = 1
+    with open(usernameFilepath) as file:
+        usernameStr = file.read().strip()
+    with open(passwordFilepath) as file:
+        passwordStr = file.read().strip()
+    while loopNo <= retries:
+        try:
+            logger.log(
+                (10 + (20 * int(loopNo > 9))),
+                f"Attempt [{loopNo}] getting AO3.Session object.",
+            )
+            session = AO3.Session(usernameStr, passwordStr)
+        except (AO3.utils.HTTPError,) as ex:
+            loopWait(
+                loopNo=loopNo,
+                ex=ex,
+                goal="AO3.Session",
+                errLevel=logging.INFO,
+                logger=logger,
+            )
+            loopNo += 1
+        else:
+            logger.info("Got AO3.Session object")
+            loopNo = retries * 10
+    if pickleFilepath:
+        os.makedirs(os.path.dirname(pickleFilepath), exists_ok=True)
+        pickle.dump(session, pickleFilepath)
+    return session
