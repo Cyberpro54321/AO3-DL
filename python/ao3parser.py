@@ -292,12 +292,31 @@ for author in authorContents:
         workIDs.add(workID)
 
 for workID in workIDs:
-    init.logger.info(f"WorkID [{workID}]")
+    init.logger.debug(f"WorkID [{workID}]")
 
-# futuresWorks = {}
-# workObjs = []
-# with concurrent.futures.ThreadPoolExecutor(
-#     max_workers=10, thread_name_prefix=constants.threadNameBulk
-# ) as pool2:
-#     for workID in workIDs:
-#         futuresWorks[workID] = pool2.submit(download.getWorkObj, workID, logger)
+futuresWorks = {}
+workObjs = []
+with concurrent.futures.ThreadPoolExecutor(
+    max_workers=10, thread_name_prefix=constants.threadNameBulk
+) as pool2:
+    for workID in workIDs:
+        futuresWorks[workID] = pool2.submit(
+            download.getWorkObj,
+            workID=workID,
+            logger=init.logger,
+            errLogger=init.errLogger,
+            ao3Session=session,
+            tryAnon=(not config["ao3DoLoginAlways"]),
+        )
+
+for workID in futuresWorks:
+    try:
+        result = futuresWorks[workID].result()
+    except (Exception,) as ex:
+        init.errLogger.error(
+            f"Work [{workID}] raised [{type(ex).__name__}]: [{ex.args}]"
+        )
+        traceback.print_exception(ex)
+    else:
+        workObjs.append(result)
+init.logger.info(f"Input: [{len(workIDs)}] Output: [{len(workObjs)}]")
