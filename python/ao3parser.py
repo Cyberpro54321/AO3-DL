@@ -131,47 +131,57 @@ for seriesID in seriesIDs:
 for author in authors:
     logger.info(f"Author [{author}]")
 
-futures = {
-    "Work": {},
-    "Series": {},
-    "Author": {},
-}
+futuresSeries = {}
+futuresAuthors = {}
 
 with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix=constants.threadNameBulk
 ) as pool1:
-    for workID in workIDs:
-        futures["Work"][workID] = pool1.submit(download.getWorkObj, workID, logger)
     for seriesID in seriesIDs:
-        futures["Series"][seriesID] = pool1.submit(getSeriesObj, seriesID, logger)
+        futuresSeries[seriesID] = pool1.submit(getSeriesObj, seriesID, logger)
     for author in authors:
-        futures["Author"][author] = pool1.submit(getAuthorObj, author, logger)
+        futuresAuthors[author] = pool1.submit(getAuthorObj, author, logger)
 
-workObjs = []
 seriesObjs = []
 authorObjs = []
-for category in futures:
-    for item in futures[category]:
-        try:
-            result = futures[category][item].result()
-        except (UserWarning,):
-            pass
-        except (Exception,) as ex:
-            init.errLogger.error(
-                f"{category} [{item}] raised [{type(ex).__name__}]: [{ex.args}]"
-            )
-        else:
-            match category:
-                case "Work":
-                    workObjs.append(result)
-                case "Series":
-                    seriesObjs.append(result)
-                case "Author":
-                    authorObjs.append(result)
+for series in futuresSeries:
+    try:
+        result = futuresSeries[series].result()
+    except (Exception,) as ex:
+        init.errLogger.error(
+            f"Series [{series}] raised [{type(ex).__name__}]: [{ex.args}]"
+        )
+    else:
+        seriesObjs.append(result)
+for author in futuresAuthors:
+    try:
+        result = futuresAuthors[author].result()
+    except (Exception,) as ex:
+        init.errLogger.error(
+            f"Author [{author}] raised [{type(ex).__name__}]: [{ex.args}]"
+        )
+    else:
+        authorObjs.append(result)
 
+for seriesObj in seriesObjs:
+    if len(seriesObj.work_list) != seriesObj.nworks:
+        errStr = f"Series [{seriesObj.id} - {seriesObj.name}] claims to have [{seriesObj.nworks}] works, but Series.work_list returned only [{len(seriesObj.work_list)}] works."
+        init.errLogger.critical(errStr)
+        raise Exception(errStr)
 for authorObj in authorObjs:
     works = author.get_works()
     if len(works) != author.works:
-        raise Exception
+        errStr = f"Author [{author.username}] claims to have [{author.works}] works, but User.get_works() returned only [{len(works)}] works."
+        init.errLogger.critical(errStr)
+        raise Exception(errStr)
     for work in works:
-        pass
+        workIDs.add(work.id)
+
+
+futuresWorks = {}
+workObjs = []
+with concurrent.futures.ThreadPoolExecutor(
+    max_workers=10, thread_name_prefix=constants.threadNameBulk
+) as pool2:
+    for workID in workIDs:
+        futuresWorks[workID] = pool2.submit(download.getWorkObj, workID, logger)
