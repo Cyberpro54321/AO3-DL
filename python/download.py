@@ -77,7 +77,7 @@ def getWorkObj(
                     errStr = f"Work [{workID}] requires login but no AO3.Session was provided."
                     errLogger.critical(errStr)
                     raise Exception(errStr)
-        except (AttributeError,) as ex:
+        except (AO3.utils.HTTPError,) as ex:
             loopWait(
                 loopNo=loopNo,
                 ex=ex,
