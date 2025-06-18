@@ -174,7 +174,7 @@ def getAuthorWorks(
     return outSet
 
 
-init.init(json="r")
+init.init()
 config = init.config
 
 workIDs = set(())
