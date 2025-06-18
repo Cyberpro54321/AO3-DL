@@ -250,7 +250,7 @@ if __name__ == "__main__":
                 ao3Session=session,
                 tryAnon=(not init.config["ao3DoLoginAlways"]),
             )
-    workObjs = []
+    workObjs = {}
     for workID in futures:
         try:
             result = futures[workID].result()
@@ -260,16 +260,20 @@ if __name__ == "__main__":
             )
             traceback.print_exception(ex)
         else:
-            workObjs.append(result)
+            workObjs[workID] = result
+    del futures
     init.logger(f"Got [{len(workObjs)}] AO3.Work objects before blacklist filtering")
     ################################################################
     # Stage 3: Blacklist / Whitelist Filtering
     ################################################################
 
     workObjsFiltered = {}
-    for i in workObjs:
-        if processNode(workObjs[i]):
-            workObjsFiltered[i] = workObjs[i]
+    for workID in workObjs:
+        if processNode(workObjs[workID]):
+            init.logger.info(f"Work [{workID}] passed the blacklist")
+            workObjsFiltered[workID] = workObjs[workID]
+        else:
+            init.logger.info(f"Work [{workID}] failed the blacklist")
     del workObjs
     init.logger(
         f"Got [{len(workObjsFiltered)}] AO3.Work objects after blacklist filtering"
@@ -288,6 +292,7 @@ if __name__ == "__main__":
             ) as file:
                 file.write(workskin)
     init.logger(f"Wrote [{workskinsFound}] workskin files")
+    del workskinsFound
     futures2 = {}
     raws = {}
     with concurrent.futures.ThreadPoolExecutor(
