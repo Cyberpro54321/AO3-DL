@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import concurrent.futures
-import json
 import traceback
 
 import AO3
-import bs4
+import requests.exceptions
 
 import constants
 import download
@@ -45,7 +44,7 @@ def getSeriesObj(
                     errStr = f"Series [{seriesID}] requires login but no AO3.Session was provided."
                     errLogger.critical(errStr)
                     raise Exception(errStr)
-        except (AO3.utils.HTTPError,) as ex:
+        except (AO3.utils.HTTPError, requests.exceptions.ConnectionError) as ex:
             download.loopWait(
                 loopNo=loopNo,
                 ex=ex,
@@ -96,10 +95,9 @@ def getSeriesWorks(
             )
             outWorks.extend(page.work_list)
     if series.nworks != len(outWorks):
-        errLogger.error(
-            f"Series [{seriesID}] nworks [{series.nworks}] != len(work_list) [{len(outWorks)}] after loading [{pagesCount -1}] more pages."
-        )
-        errLogger.error(f"[{seriesID}]: [{outWorks}]")
+        errStr = f"Series [{seriesID}] claims to have [{series.nworks}] works, but Series.work_list returned only [{len(outWorks)}] works after loading [{pagesCount - 1}] more pages."
+        errLogger.critical(errStr)
+        raise Exception(errStr)
     outSet = set(())
     for work in outWorks:
         outSet.add(work.id)
@@ -125,7 +123,7 @@ def getAuthorObj(
                 f"Attempt [{loopNo}] getting AO3.User object [{username}]",
             )
             author = AO3.User(username=username, session=ao3SessionInUse)
-        except (AO3.utils.HTTPError,) as ex:
+        except (AO3.utils.HTTPError, requests.exceptions.ConnectionError) as ex:
             download.loopWait(
                 loopNo=loopNo,
                 ex=ex,
@@ -221,12 +219,6 @@ for line in inRaw:
             f"Plain string [{line}] passed to parser.py, assuming it is an author username."
         )
 
-for workID in workIDs:
-    init.logger.info(f"WorkID [{workID}]")
-for seriesID in seriesIDs:
-    init.logger.info(f"SeriesID [{seriesID}]")
-for author in authors:
-    init.logger.info(f"Author [{author}]")
 
 futuresSeries = {}
 futuresAuthors = {}
@@ -290,33 +282,5 @@ for series in seriesContents:
 for author in authorContents:
     for workID in author:
         workIDs.add(workID)
-
 for workID in workIDs:
-    init.logger.debug(f"WorkID [{workID}]")
-
-futuresWorks = {}
-workObjs = []
-with concurrent.futures.ThreadPoolExecutor(
-    max_workers=10, thread_name_prefix=constants.threadNameBulk
-) as pool2:
-    for workID in workIDs:
-        futuresWorks[workID] = pool2.submit(
-            download.getWorkObj,
-            workID=workID,
-            logger=init.logger,
-            errLogger=init.errLogger,
-            ao3Session=session,
-            tryAnon=(not config["ao3DoLoginAlways"]),
-        )
-
-for workID in futuresWorks:
-    try:
-        result = futuresWorks[workID].result()
-    except (Exception,) as ex:
-        init.errLogger.error(
-            f"Work [{workID}] raised [{type(ex).__name__}]: [{ex.args}]"
-        )
-        traceback.print_exception(ex)
-    else:
-        workObjs.append(result)
-init.logger.info(f"Input: [{len(workIDs)}] Output: [{len(workObjs)}]")
+    print(workID)
