@@ -43,9 +43,7 @@ def processSingle(
 ) -> None:
     logger.info(f"Started Processing [{workID}]")
     sqlInfo = {}
-    rawFilename = os.path.join(
-        config["dirRaws"], f"{workID:0>{constants.workIdMaxDigits}}.html"
-    )
+    rawFilename = os.path.join(config["dirRaws"], f"{workID:0>8}.html")
     with open(rawFilename) as rawFile:
         rawSoup = bs4.BeautifulSoup(rawFile, features="lxml")
     wIdFolder = os.path.join(config["dirOut"], f"{workID:0>8}")
