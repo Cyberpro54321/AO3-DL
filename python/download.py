@@ -158,3 +158,23 @@ def getSessionObj(
         with open(pickleFilepath, "wb") as file:
             pickle.dump(session, file)
     return session
+
+
+def login(
+    config: dict,
+    logger: init.logging.Logger,
+    errLogger: init.logging.Logger = None,
+) -> AO3.Session | None:
+    if not errLogger:
+        errLogger = logger
+    if config["ao3DoLogin"]:
+        session = getSessionObj(
+            usernameFilepath=config["ao3UsernameFile"],
+            passwordFilepath=config["ao3PasswordFile"],
+            logger=logger,
+            errLogger=errLogger,
+            pickleFilepath=config["ao3SessionPickle"],
+        )
+    else:
+        session = None
+    return session

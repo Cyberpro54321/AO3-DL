@@ -223,16 +223,7 @@ for line in inRaw:
 futuresSeries = {}
 futuresAuthors = {}
 
-if config["ao3DoLogin"]:
-    session = download.getSessionObj(
-        usernameFilepath=config["ao3UsernameFile"],
-        passwordFilepath=config["ao3PasswordFile"],
-        logger=init.logger,
-        errLogger=init.errLogger,
-        pickleFilepath=config["ao3SessionPickle"],
-    )
-else:
-    session = None
+session = download.login(config, init.logger, init.errLogger)
 
 with concurrent.futures.ThreadPoolExecutor(
     max_workers=10, thread_name_prefix=constants.threadNameBulk
