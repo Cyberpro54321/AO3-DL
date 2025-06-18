@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import concurrent.futures
 import datetime
 import os.path
@@ -209,6 +210,12 @@ def getWorkskin(
     return workskin
 
 
+def processNode(
+    work: AO3.Work,
+) -> bool:
+    return True
+
+
 if __name__ == "__main__":
     ################################################################
     # Stage 1: Initialization
@@ -221,7 +228,7 @@ if __name__ == "__main__":
             workIDs.add(int(line))
         except ValueError:
             init.errLogger.error(f"Could not convert input [{line}] to int")
-    init.logger(f"Got [{len(workIDs)}] workIDs")
+    init.logger.info(f"Got [{len(workIDs)}] workIDs")
     ################################################################
     # Stage 2: Get All Work Objects
     ################################################################
@@ -259,7 +266,10 @@ if __name__ == "__main__":
     # Stage 3: Blacklist / Whitelist Filtering
     ################################################################
 
-    workObjsFiltered = workObjs
+    workObjsFiltered = {}
+    for i in workObjs:
+        if processNode(workObjs[i]):
+            workObjsFiltered[i] = workObjs[i]
     del workObjs
     init.logger(
         f"Got [{len(workObjsFiltered)}] AO3.Work objects after blacklist filtering"
