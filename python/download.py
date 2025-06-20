@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import concurrent.futures
 import datetime
+import json
 import os.path
 import pickle
 import random
@@ -210,10 +211,138 @@ def getWorkskin(
     return workskin
 
 
+def getRaw(
+    work: AO3.Work,
+    logger: init.logging.Logger,
+    retries: int = constants.loopRetries,
+) -> bytes:
+    loopNo = 1
+    while loopNo <= retries:
+        try:
+            logger.log(
+                (10 + (20 * int(loopNo > 9))),
+                f"Attempt [{loopNo}] downloading raw for Work [{work.id}]",
+            )
+            raw = work.download(filetype="HTML")
+        except AO3.utils.HTTPError as ex:
+            loopWait(
+                loopNo=loopNo,
+                ex=ex,
+                goal="Raw File",
+                errLevel=init.logging.INFO,
+                logger=logger,
+                id=work.id,
+            )
+            loopNo += 1
+        else:
+            logger.info(f"Got raw for Work [{work.id}]")
+            loopNo = retries * 10
+            return raw
+
+
+def matchTag(
+    work: AO3.Work,
+    category: str,
+    tag,
+) -> bool:
+    match category:
+        case "rating":
+            return bool(tag == work.rating)
+        case "warning":
+            return bool(tag in work.warnings)
+        case "category":
+            return bool(tag in work.categories)
+        case "fandom":
+            return bool(tag in work.fandoms)
+        case "ship":
+            return bool(tag in work.relationships)
+        case "char":
+            return bool(tag in work.characters)
+        case "tag":
+            return bool(tag in work.tags)
+        case "lang":
+            return bool(tag == work.language)
+        case "complete":
+            return bool(str(tag)[:1].lower() == str(work.complete)[:1].lower())
+        case "author":
+            return bool(tag in work.authors)
+
+
+def matchStat(
+    work: AO3.Work,
+    stat: str,
+    value: int,
+    mode: str,
+):
+    if str(mode)[:1].lower() in (1, "1", "g"):
+        mode = True
+    else:
+        mode = False
+
+    def compare(i0: int, i1: int, greater: bool):
+        if greater:
+            return bool(i0 < i1)
+        else:
+            return bool(i0 > i1)
+
+    match stat:
+        case "datePublished":
+            return compare(
+                i0=int(work.date_published.timestamp()), i1=value, greater=mode
+            )
+        case "dateUpdated":
+            return compare(
+                i0=int(work.date_updated.timestamp()), i1=value, greater=mode
+            )
+        case "words":
+            return compare(i0=work.words, i1=value, greater=mode)
+        case "nChap":
+            return compare(i0=work.nchapters, i1=value, greater=mode)
+        case "xChap":
+            return compare(i0=work.expected_chapters, i1=value, greater=mode)
+        case "comments":
+            return compare(i0=work.comments, i1=value, greater=mode)
+        case "kudos":
+            return compare(i0=work.kudos, i1=value, greater=mode)
+        case "bookmarks":
+            return compare(i0=work.bookmarks, i1=value, greater=mode)
+        case "hits":
+            return compare(i0=work.hits, i1=value, greater=mode)
+
+
 def processNode(
     work: AO3.Work,
+    node: dict,
 ) -> bool:
-    return True
+    if node:
+        match node.get("op", default="and"):  # 'op' = 'operator'
+            case "matchTag":
+                return matchTag(work=work, category=node["category"], tag=node["tag"])
+            case "matchStat":
+                return matchStat(
+                    work=work,
+                    stat=node["stat"],
+                    value=node["value"],
+                    mode=node["greater"],
+                )
+            case "not":
+                return not processNode(work=work, node=node["children"][0])
+            case "or":
+                valid = False
+                counter = 0
+                while (not valid) and (counter < len(node["children"])):
+                    valid = processNode(work=work, node=node["children"][counter])
+                    counter += 1
+                del counter
+                return valid
+            case "and":
+                valid = True
+                for child in node["children"]:
+                    if not processNode(work=work, node=child):
+                        valid = False
+                return valid
+    else:
+        return True
 
 
 if __name__ == "__main__":
@@ -262,20 +391,27 @@ if __name__ == "__main__":
         else:
             workObjs[workID] = result
     del futures
-    init.logger(f"Got [{len(workObjs)}] AO3.Work objects before blacklist filtering")
+    init.logger.info(
+        f"Got [{len(workObjs)}] AO3.Work objects before blacklist filtering"
+    )
     ################################################################
     # Stage 3: Blacklist / Whitelist Filtering
     ################################################################
 
     workObjsFiltered = {}
+    if init.args.json:
+        jsonFile = init.args.json[0]
+        whitelist = json.load(init.args.json[0])
+    else:
+        whitelist = {}
     for workID in workObjs:
-        if processNode(workObjs[workID]):
+        if processNode(workObjs[workID], whitelist):
             init.logger.info(f"Work [{workID}] passed the blacklist")
             workObjsFiltered[workID] = workObjs[workID]
         else:
             init.logger.info(f"Work [{workID}] failed the blacklist")
     del workObjs
-    init.logger(
+    init.logger.info(
         f"Got [{len(workObjsFiltered)}] AO3.Work objects after blacklist filtering"
     )
 
@@ -283,23 +419,28 @@ if __name__ == "__main__":
     # Stage 4: Save .css and .html files
     ################################################################
     workskinsFound = 0
-    for work in workObjsFiltered:
-        workskin = getWorkskin(work=work, logger=init.logger)
+    for workID in workObjsFiltered:
+        workskin = getWorkskin(work=workObjsFiltered[workID], logger=init.logger)
         if workskin:
             workskinsFound += 1
             with open(
-                os.path.join(init.config["dirRaws"], f"{work.id:0>8}.css"), "w"
+                os.path.join(
+                    init.config["dirRaws"], f"{workObjsFiltered[workID].id:0>8}.css"
+                ),
+                "w",
             ) as file:
                 file.write(workskin)
-    init.logger(f"Wrote [{workskinsFound}] workskin files")
+    init.logger.info(f"Wrote [{workskinsFound}] workskin files")
     del workskinsFound
     futures2 = {}
     raws = {}
     with concurrent.futures.ThreadPoolExecutor(
         max_workers=10, thread_name_prefix=constants.threadNameBulk
     ) as pool2:
-        for work in workObjsFiltered:
-            futures2[work.id] = pool2.submit(work.download, filetype="HTML")
+        for workID in workObjsFiltered:
+            futures2[workID] = pool2.submit(
+                getRaw, work=workObjsFiltered[workID], logger=init.logger
+            )
     for workID in futures2:
         try:
             result = futures2[workID].result()
@@ -327,3 +468,4 @@ if __name__ == "__main__":
             os.path.join(init.config["dirOut"], f"{workID:0>8}.html"), "w"
         ) as file:
             file.write(soup.prettify(formatter="html5"))
+    init.logger.info("All operations complete, download.py exiting.")
