@@ -1,0 +1,31 @@
+{
+  "op": "and",
+  "children": [
+    {
+      "op": "not",
+      "children": [
+        {
+          "op": "matchTag",
+          "category": "tag",
+          "tag": "Abandoned Work - Unfinished and Discontinued"
+        }
+      ]
+    },
+    {
+      "op": "or",
+      "children": [
+        {
+          "op": "matchTag",
+          "category": "complete",
+          "tag": "t"
+        },
+        {
+          "op": "matchStat",
+          "stat": "dateUpdated",
+          "value": "1577836800",
+          "greater": "t"
+        }
+      ]
+    }
+  ]
+}
