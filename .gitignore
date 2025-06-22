@@ -2,7 +2,9 @@
 *.db
 mounts
 __pycache__
-*/test.*
+*test*
+*temp*
 *.secret
 *.txt
 *.csv
+*.log
