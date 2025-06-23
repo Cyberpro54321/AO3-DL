@@ -288,11 +288,11 @@ def matchStat(
     match stat:
         case "datePublished":
             return compare(
-                i0=int(work.date_published.timestamp()), i1=value, greater=mode
+                i0=int(work.date_published.timestamp()), i1=int(value), greater=mode
             )
         case "dateUpdated":
             return compare(
-                i0=int(work.date_updated.timestamp()), i1=value, greater=mode
+                i0=int(work.date_updated.timestamp()), i1=int(value), greater=mode
             )
         case "words":
             return compare(i0=work.words, i1=value, greater=mode)
@@ -315,7 +315,7 @@ def processNode(
     node: dict,
 ) -> bool:
     if node:
-        match node.get("op", default="and"):  # 'op' = 'operator'
+        match node.get("op", "and"):  # 'op' = 'operator'
             case "matchTag":
                 return matchTag(work=work, category=node["category"], tag=node["tag"])
             case "matchStat":
