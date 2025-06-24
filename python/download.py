@@ -349,7 +349,10 @@ if __name__ == "__main__":
     ################################################################
     # Stage 1: Initialization
     ################################################################
-    init.init(json="r")
+    init.init(
+        json="r",
+        dryRun=True,
+    )
     workIDs = set(())
     inRaw = init.parseInfile(init.args.infile, init.errLogger)
     for line in inRaw:
@@ -418,54 +421,55 @@ if __name__ == "__main__":
     ################################################################
     # Stage 4: Save .css and .html files
     ################################################################
-    workskinsFound = 0
-    for workID in workObjsFiltered:
-        workskin = getWorkskin(work=workObjsFiltered[workID], logger=init.logger)
-        if workskin:
-            workskinsFound += 1
-            with open(
-                os.path.join(
-                    init.config["dirRaws"], f"{workObjsFiltered[workID].id:0>8}.css"
-                ),
-                "w",
-            ) as file:
-                file.write(workskin)
-    init.logger.info(f"Wrote [{workskinsFound}] workskin files")
-    del workskinsFound
-    futures2 = {}
-    raws = {}
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=10, thread_name_prefix=constants.threadNameBulk
-    ) as pool2:
+    if not init.args.dry_run:
+        workskinsFound = 0
         for workID in workObjsFiltered:
-            futures2[workID] = pool2.submit(
-                getRaw, work=workObjsFiltered[workID], logger=init.logger
+            workskin = getWorkskin(work=workObjsFiltered[workID], logger=init.logger)
+            if workskin:
+                workskinsFound += 1
+                with open(
+                    os.path.join(
+                        init.config["dirRaws"], f"{workObjsFiltered[workID].id:0>8}.css"
+                    ),
+                    "w",
+                ) as file:
+                    file.write(workskin)
+        init.logger.info(f"Wrote [{workskinsFound}] workskin files")
+        del workskinsFound
+        futures2 = {}
+        raws = {}
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix=constants.threadNameBulk
+        ) as pool2:
+            for workID in workObjsFiltered:
+                futures2[workID] = pool2.submit(
+                    getRaw, work=workObjsFiltered[workID], logger=init.logger
+                )
+        for workID in futures2:
+            try:
+                result = futures2[workID].result()
+            except Exception as ex:
+                init.errLogger.error(
+                    f"Work [{workID}] raised [{type(ex).__name__}] while downloading raw: [{ex.args}]"
+                )
+                traceback.print_exception(ex)
+            else:
+                raws[workID] = result
+        for workID in raws:
+            soup = bs4.BeautifulSoup(raws[workID], "lxml")
+            soup.append(bs4.Comment(f"{constants.commentVersion}{constants.version}"))
+            soup.append(
+                bs4.Comment(
+                    f"{constants.commentTimestampEdited}{workObjsFiltered[workID].date_edited.isoformat()}"
+                )
             )
-    for workID in futures2:
-        try:
-            result = futures2[workID].result()
-        except Exception as ex:
-            init.errLogger.error(
-                f"Work [{workID}] raised [{type(ex).__name__}] while downloading raw: [{ex.args}]"
+            soup.append(
+                bs4.Comment(
+                    f"{constants.commentTimestampDownloaded}{datetime.datetime.now().isoformat()}"
+                )
             )
-            traceback.print_exception(ex)
-        else:
-            raws[workID] = result
-    for workID in raws:
-        soup = bs4.BeautifulSoup(raws[workID], "lxml")
-        soup.append(bs4.Comment(f"{constants.commentVersion}{constants.version}"))
-        soup.append(
-            bs4.Comment(
-                f"{constants.commentTimestampEdited}{workObjsFiltered[workID].date_edited.isoformat()}"
-            )
-        )
-        soup.append(
-            bs4.Comment(
-                f"{constants.commentTimestampDownloaded}{datetime.datetime.now().isoformat()}"
-            )
-        )
-        with open(
-            os.path.join(init.config["dirOut"], f"{workID:0>8}.html"), "w"
-        ) as file:
-            file.write(soup.prettify(formatter="html5"))
+            with open(
+                os.path.join(init.config["dirOut"], f"{workID:0>8}.html"), "w"
+            ) as file:
+                file.write(soup.prettify(formatter="html5"))
     init.logger.info("All operations complete, download.py exiting.")

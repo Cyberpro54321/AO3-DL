@@ -36,6 +36,7 @@ def getLogger(
 
 def init(
     json: str = "",
+    dryRun: bool = False,
 ) -> None:
     global args
     global config
@@ -70,6 +71,13 @@ def init(
             nargs=1,
             type=argparse.FileType(json),
             help="JSON file containing a whitelist and/or blacklist of works to include.",
+        )
+    if dryRun:
+        parser.add_argument(
+            "--dry-run",
+            "-d",
+            action="store_true",
+            help="Perform a 'dry run' without downloading any files or saving anything to local storage.",
         )
     parser.add_argument("--log-level", "-l", default="")
     args = parser.parse_args()
